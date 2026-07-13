@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Generador de Entrenos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1C1B1A;
+    color: #EDEAE3;
+    font-family: 'Barlow', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .oswald { font-family: 'Oswald', sans-serif; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 60px; }
+  .badge {
+    display: inline-block; background: #E8B93A; color: #1C1B1A;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    padding: 4px 10px; margin-bottom: 12px; text-transform: uppercase;
+  }
+  h1 { font-size: 36px; font-weight: 700; line-height: 1.05; }
+  .subtitle { color: #9A948A; margin-top: 10px; font-size: 15px; line-height: 1.5; }
+  .section-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #9A948A;
+    margin-bottom: 10px; text-transform: uppercase; font-family: 'Oswald', sans-serif;
+  }
+  .days { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .day-chip {
+    cursor: pointer; border: 2px solid #3D3A36; background: #262422; color: #EDEAE3;
+    border-radius: 8px; padding: 10px 16px; font-weight: 600; font-size: 14px;
+    font-family: 'Barlow', sans-serif; transition: all 0.15s ease;
+  }
+  .day-chip:hover { transform: translateY(-2px); }
+  .day-chip.active { border-color: #E8B93A; background: #E8B93A; color: #1C1B1A; }
+  .gen-btn {
+    width: 100%; padding: 16px; background: #E8B93A; color: #1C1B1A; border: none;
+    border-radius: 8px; font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; cursor: pointer; margin-bottom: 20px; font-family: 'Oswald', sans-serif;
+  }
+  .gen-btn:disabled { background: #3D3A36; color: #9A948A; cursor: not-allowed; }
+  .gen-btn:active:not(:disabled) { transform: scale(0.98); }
+  .total-week {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+    padding: 10px 14px; background: #262422; border: 1px solid #3D3A36; border-radius: 8px; font-size: 13px;
+  }
+  .total-week span.val { color: #E8B93A; font-weight: 700; font-size: 16px; font-family: 'Oswald', sans-serif; }
+  .day-card { background: #262422; border: 1px solid #3D3A36; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .day-head {
+    display: flex; justify-content: space-between; align-items: center; padding: 14px 18px;
+    border-bottom: 1px solid #3D3A36; background: #2A2826;
+  }
+  .day-head .dia-full { font-size: 12px; color: #E8B93A; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
+  .day-head .sesion-nombre { font-size: 19px; font-weight: 600; font-family: 'Oswald', sans-serif; }
+  .kcal-box { text-align: right; }
+  .kcal-box .num { font-size: 15px; font-weight: 700; font-family: 'Oswald', sans-serif; }
+  .kcal-box .lbl { font-size: 10px; color: #7d786f; text-transform: uppercase; letter-spacing: 0.05em; }
+  .regen-btn {
+    background: transparent; border: 1px solid #3D3A36; color: #9A948A; border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif; white-space: nowrap;
+  }
+  .regen-btn:hover { background: #3D3A36; }
+  .row {
+    display: flex; flex-direction: column; padding: 10px 18px;
+    font-size: 14px; border-bottom: 1px solid #322F2C; gap: 6px;
+  }
+  .row.warmup { flex-direction: row; justify-content: space-between; align-items: center; }
+  .row:hover { background: rgba(232, 185, 58, 0.06); }
+  .row.warmup { color: #9A948A; }
+  .row.warmup .detalle { font-style: italic; }
+  .row .info { min-width: 0; }
+  .row .sub { color: #7d786f; font-size: 12px; margin-top: 2px; }
+  .machine-tag {
+    margin-left: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+    color: #E8B93A; border: 1px solid #4a4230; border-radius: 4px; padding: 1px 5px; vertical-align: middle;
+  }
+  .sets-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .set-box { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .set-box .set-lbl { font-size: 9px; color: #7d786f; text-transform: uppercase; letter-spacing: 0.05em; }
+  .set-box input {
+    width: 46px; background: #1C1B1A; border: 1px solid #3D3A36; border-radius: 6px;
+    color: #EDEAE3; padding: 6px 4px; font-size: 13px; text-align: center; font-family: 'Barlow', sans-serif;
+  }
+  .set-box input.saved { border-color: #8FBF5C; }
+  .abs-label {
+    padding: 10px 18px 4px; font-size: 11px; color: #E8B93A; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Oswald', sans-serif;
+  }
+  .footnote { color: #7d786f; font-size: 12px; margin-top: 20px; line-height: 1.5; }
+  @media (max-width: 480px) { h1 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="badge">Cinta 10' → Fuerza → Abdominales</div>
+  <h1 class="oswald">GENERADOR<br/>DE ENTRENOS</h1>
+  <p class="subtitle">Elige los días que entrenas. Anota el peso que uses en cada ejercicio y la próxima vez que te toque verás con qué kilos empezaste la última vez.</p>
+
+  <div class="section-label">¿Qué días entrenas?</div>
+  <div class="days" id="days"></div>
+
+  <button class="gen-btn oswald" id="genBtn" disabled>Generar entrenamientos</button>
+
+  <div class="total-week" id="totalWeek" style="display:none;">
+    <span>Total estimado de la semana</span>
+    <span class="val" id="totalWeekVal">~0 kcal</span>
+  </div>
+
+  <div id="plan"></div>
+
+  <p class="footnote" id="footnote" style="display:none;">
+    Puedes anotar el peso de cada serie por separado (S1, S2, S3...). Se guardan en este dispositivo
+    (en este navegador) al salir de cada casilla. Cuando el ejercicio se repita en una futura sesión,
+    verás "última vez" con el peso de cada serie y la fecha, para saber por dónde empezar.
+    Las calorías son una estimación orientativa, no una medición exacta.
+  </p>
+</div>
+
+<script>
+const DIAS = [
+  { id: "lun", label: "Lun", full: "Lunes" },
+  { id: "mar", label: "Mar", full: "Martes" },
+  { id: "mie", label: "Mié", full: "Miércoles" },
+  { id: "jue", label: "Jue", full: "Jueves" },
+  { id: "vie", label: "Vie", full: "Viernes" },
+  { id: "sab", label: "Sáb", full: "Sábado" },
+  { id: "dom", label: "Dom", full: "Domingo" },
+];
+
+const SPLITS = {
+  1: ["Full Body"],
+  2: ["Full Body A", "Full Body B"],
+  3: ["Empuje (Pecho/Hombro/Tríceps)", "Tracción (Espalda/Bíceps)", "Pierna"],
+  4: ["Tren superior A", "Tren inferior A", "Tren superior B", "Tren inferior B"],
+  5: ["Empuje", "Tracción", "Pierna", "Tren superior", "Tren inferior"],
+  6: ["Empuje", "Tracción", "Pierna", "Empuje", "Tracción", "Pierna"],
+  7: ["Empuje", "Tracción", "Pierna", "Empuje", "Tracción", "Pierna", "Full Body"],
+};
+
+const GRUPO_POR_SESION = {
+  "Full Body": "full", "Full Body A": "full", "Full Body B": "full",
+  "Empuje (Pecho/Hombro/Tríceps)": "empuje", "Empuje": "empuje",
+  "Tracción (Espalda/Bíceps)": "traccion", "Tracción": "traccion",
+  "Pierna": "pierna",
+  "Tren superior A": "superior", "Tren superior B": "superior", "Tren superior": "superior",
+  "Tren inferior A": "pierna", "Tren inferior B": "pierna", "Tren inferior": "pierna",
+};
+
+const POOLS = {
+  empuje: [
+    { n: "Press de pecho en máquina", m: true, c: true },
+    { n: "Press de hombro en máquina", m: true, c: true },
+    { n: "Pec deck / aperturas en máquina", m: true, c: false },
+    { n: "Fondos asistidos en máquina", m: true, c: true },
+    { n: "Press inclinado en máquina", m: true, c: true },
+    { n: "Press convergente en máquina", m: true, c: true },
+    { n: "Extensión de tríceps en polea", m: true, c: false },
+    { n: "Elevaciones laterales en polea", m: true, c: false },
+    { n: "Press de tríceps en máquina", m: true, c: false },
+    { n: "Cruce de poleas (aperturas en polea)", m: true, c: false },
+    { n: "Press banca con barra", m: false, c: true },
+    { n: "Press banca inclinado con mancuernas", m: false, c: true },
+    { n: "Press militar de pie", m: false, c: true },
+    { n: "Press Arnold", m: false, c: true },
+    { n: "Fondos en paralelas", m: false, c: true },
+    { n: "Aperturas con mancuernas", m: false, c: false },
+    { n: "Press francés", m: false, c: false },
+    { n: "Elevaciones laterales con mancuernas", m: false, c: false },
+    { n: "Fondos en banco", m: false, c: true },
+    { n: "Patada de tríceps con mancuerna", m: false, c: false },
+  ],
+  traccion: [
+    { n: "Jalón al pecho en polea", m: true, c: true },
+    { n: "Remo en polea baja (sentado)", m: true, c: true },
+    { n: "Remo horizontal en máquina", m: true, c: true },
+    { n: "Curl de bíceps en máquina", m: true, c: false },
+    { n: "Jalón tras nuca en polea", m: true, c: true },
+    { n: "Dominadas asistidas en máquina", m: true, c: true },
+    { n: "Face pull en polea", m: true, c: false },
+    { n: "Curl de bíceps en polea", m: true, c: false },
+    { n: "Pull-over en polea", m: true, c: false },
+    { n: "Remo en máquina unilateral", m: true, c: true },
+    { n: "Dominadas pronas", m: false, c: true },
+    { n: "Remo con barra", m: false, c: true },
+    { n: "Remo con mancuerna a una mano", m: false, c: true },
+    { n: "Curl de bíceps con barra", m: false, c: false },
+    { n: "Curl martillo", m: false, c: false },
+    { n: "Curl inclinado con mancuernas", m: false, c: false },
+    { n: "Peso muerto rumano", m: false, c: true },
+  ],
+  pierna: [
+    { n: "Prensa de piernas", m: true, c: true },
+    { n: "Extensión de cuádriceps en máquina", m: true, c: false },
+    { n: "Curl femoral en máquina", m: true, c: false },
+    { n: "Máquina de aductores", m: true, c: false },
+    { n: "Máquina de abductores", m: true, c: false },
+    { n: "Elevación de talones en máquina (gemelo)", m: true, c: false },
+    { n: "Hack squat en máquina", m: true, c: true },
+    { n: "Sentadilla en máquina Smith", m: true, c: true },
+    { n: "Máquina de glúteo (patada en máquina)", m: true, c: false },
+    { n: "Prensa horizontal", m: true, c: true },
+    { n: "Sentadilla con barra", m: false, c: true },
+    { n: "Zancadas con mancuernas", m: false, c: true },
+    { n: "Peso muerto convencional", m: false, c: true },
+    { n: "Hip thrust con barra", m: false, c: true },
+    { n: "Sentadilla búlgara", m: false, c: true },
+    { n: "Peso muerto rumano con mancuernas", m: false, c: true },
+    { n: "Zancada búlgara con barra", m: false, c: true },
+  ],
+  superior: [
+    { n: "Press de pecho en máquina", m: true, c: true },
+    { n: "Press de hombro en máquina", m: true, c: true },
+    { n: "Jalón al pecho en polea", m: true, c: true },
+    { n: "Remo en polea baja (sentado)", m: true, c: true },
+    { n: "Fondos asistidos en máquina", m: true, c: true },
+    { n: "Dominadas asistidas en máquina", m: true, c: true },
+    { n: "Curl de bíceps en máquina", m: true, c: false },
+    { n: "Extensión de tríceps en polea", m: true, c: false },
+    { n: "Elevaciones laterales en polea", m: true, c: false },
+    { n: "Face pull en polea", m: true, c: false },
+    { n: "Press banca con barra", m: false, c: true },
+    { n: "Dominadas pronas", m: false, c: true },
+    { n: "Press militar de pie", m: false, c: true },
+    { n: "Remo con barra", m: false, c: true },
+    { n: "Fondos en paralelas", m: false, c: true },
+    { n: "Curl de bíceps con barra", m: false, c: false },
+  ],
+  full: [
+    { n: "Prensa de piernas", m: true, c: true },
+    { n: "Press de pecho en máquina", m: true, c: true },
+    { n: "Remo horizontal en máquina", m: true, c: true },
+    { n: "Extensión de cuádriceps en máquina", m: true, c: false },
+    { n: "Jalón al pecho en polea", m: true, c: true },
+    { n: "Press de hombro en máquina", m: true, c: true },
+    { n: "Curl femoral en máquina", m: true, c: false },
+    { n: "Curl de bíceps en máquina", m: true, c: false },
+    { n: "Sentadilla con barra", m: false, c: true },
+    { n: "Press banca con barra", m: false, c: true },
+    { n: "Remo con barra", m: false, c: true },
+    { n: "Peso muerto rumano", m: false, c: true },
+    { n: "Press militar de pie", m: false, c: true },
+    { n: "Dominadas pronas", m: false, c: true },
+    { n: "Zancadas con mancuernas", m: false, c: true },
+  ],
+};
+
+const ABDOMINALES = [
+  { n: "Crunch en máquina", m: true },
+  { n: "Crunch en polea alta", m: true },
+  { n: "Máquina de rotación de tronco", m: true },
+  { n: "Máquina de flexión lateral (oblicuos)", m: true },
+  { n: "Pallof press en polea", m: true },
+  { n: "Elevación de piernas colgado", m: false },
+  { n: "Plancha frontal", m: false },
+  { n: "Rueda rusa (ab wheel)", m: false },
+  { n: "Plancha lateral", m: false },
+  { n: "Elevación de rodillas en paralelas", m: false },
+  { n: "Bicicleta (crunch oblicuo)", m: false },
+  { n: "Crunch en el suelo", m: false },
+  { n: "Mountain climbers", m: false },
+  { n: "Crunch inverso", m: false },
+  { n: "Hollow hold", m: false },
+];
+
+function pickPriorizandoMaquinas(pool, n) {
+  const copy = pool.map((e) => ({ ...e }));
+  const out = [];
+  for (let i = 0; i < n && copy.length > 0; i++) {
+    const weights = copy.map((e) => (e.m ? 3 : 1));
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    let idx = 0;
+    for (; idx < weights.length; idx++) {
+      r -= weights[idx];
+      if (r <= 0) break;
+    }
+    out.push(copy.splice(Math.min(idx, copy.length - 1), 1)[0]);
+  }
+  return out;
+}
+
+function repsFor(nombre) {
+  const pesados = ["Sentadilla con barra", "Peso muerto convencional", "Peso muerto rumano",
+    "Press banca con barra", "Press militar de pie", "Dominadas pronas", "Remo con barra",
+    "Hack squat en máquina", "Sentadilla en máquina Smith"];
+  if (pesados.includes(nombre)) return { series: 4, reps: "6-8" };
+  return { series: 3 + (Math.random() > 0.5 ? 1 : 0), reps: ["8-10", "10-12", "12-15"][Math.floor(Math.random() * 3)] };
+}
+
+function slugify(nombre) {
+  return nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function kcalPorSerie(ej) { return ej.c ? 9 : 6; }
+
+function kcalSesion(sesion) {
+  const calentamiento = 90;
+  const principal = sesion.ejercicios.reduce((acc, ej) => acc + ej.series * kcalPorSerie(ej), 0);
+  const abs = sesion.abdominales.reduce((acc, ej) => acc + ej.series * 4, 0);
+  return Math.round((calentamiento + principal + abs) / 10) * 10;
+}
+
+function generarSesion(nombreSesion) {
+  const grupo = GRUPO_POR_SESION[nombreSesion] || "full";
+  const pool = POOLS[grupo];
+  const nEjercicios = grupo === "full" ? 6 : 7;
+  const elegidos = pickPriorizandoMaquinas(pool, nEjercicios);
+  const abs = pickPriorizandoMaquinas(ABDOMINALES, 3);
+  const sesion = {
+    nombre: nombreSesion,
+    calentamiento: { nombre: "Cinta / cardio suave", detalle: "10 min, ritmo cómodo para elevar pulsaciones" },
+    ejercicios: elegidos.map((ej) => ({ nombre: ej.n, maquina: ej.m, c: ej.c, ...repsFor(ej.n) })),
+    abdominales: abs.map((ej) => ({
+      nombre: ej.n, maquina: ej.m, series: 3,
+      reps: ej.n.includes("Plancha") || ej.n.includes("Hollow") ? "30-45 seg" : "12-15",
+    })),
+  };
+  sesion.kcal = kcalSesion(sesion);
+  return sesion;
+}
+
+// ---- Persistencia local (localStorage) ----
+function getPesoGuardado(slug) {
+  try {
+    const raw = localStorage.getItem("peso:" + slug);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function guardarPesoLocal(slug, weight) {
+  const dato = { weight, date: new Date().toISOString().slice(0, 10) };
+  localStorage.setItem("peso:" + slug, JSON.stringify(dato));
+  return dato;
+}
+
+// ---- Estado ----
+let seleccionados = [];
+let plan = null;
+
+const daysEl = document.getElementById("days");
+const genBtn = document.getElementById("genBtn");
+const planEl = document.getElementById("plan");
+const totalWeekEl = document.getElementById("totalWeek");
+const totalWeekValEl = document.getElementById("totalWeekVal");
+const footnoteEl = document.getElementById("footnote");
+
+DIAS.forEach((d) => {
+  const btn = document.createElement("button");
+  btn.className = "day-chip";
+  btn.textContent = d.label;
+  btn.onclick = () => {
+    const idx = seleccionados.indexOf(d.id);
+    if (idx >= 0) seleccionados.splice(idx, 1);
+    else seleccionados.push(d.id);
+    btn.classList.toggle("active");
+    genBtn.disabled = seleccionados.length === 0;
+  };
+  daysEl.appendChild(btn);
+});
+
+genBtn.onclick = () => {
+  if (seleccionados.length === 0) return;
+  const orden = DIAS.filter((d) => seleccionados.includes(d.id));
+  const splits = SPLITS[Math.min(orden.length, 7)];
+  plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length]) }));
+  genBtn.textContent = "Generar de nuevo";
+  render();
+};
+
+function formatUltimaVez(slug, nSeries) {
+  const datos = [];
+  let maxDate = null;
+  for (let s = 0; s < nSeries; s++) {
+    const d = getPesoGuardado(`${slug}:s${s}`);
+    datos.push(d ? d.weight : null);
+    if (d && (!maxDate || d.date > maxDate)) maxDate = d.date;
+  }
+  if (datos.every((d) => d === null)) return "";
+  const pesosTxt = datos.map((d) => (d === null ? "–" : d)).join("/");
+  return ` · última vez: ${pesosTxt} kg (${maxDate})`;
+}
+
+function filaEjercicioHTML(ej, index) {
+  const slug = slugify(ej.nombre);
+  const nSeries = ej.series;
+  const numLabel = index != null ? (index + 1) + ". " : "";
+  const setsHtml = Array.from({ length: nSeries }).map((_, s) => {
+    const ant = getPesoGuardado(`${slug}:s${s}`);
+    return `
+      <div class="set-box">
+        <span class="set-lbl">S${s + 1}</span>
+        <input type="number" inputmode="decimal" data-slug="${slug}" data-set="${s}" placeholder="${ant ? ant.weight : 'kg'}" />
+      </div>`;
+  }).join("");
+  return `
+    <div class="row" data-exslug="${slug}" data-exseries="${nSeries}">
+      <div class="info">
+        <div>${numLabel}${ej.nombre}${ej.maquina ? '<span class="machine-tag">MÁQUINA</span>' : ''}</div>
+        <div class="sub" data-sub="${slug}">${ej.series}x${ej.reps}${formatUltimaVez(slug, nSeries)}</div>
+      </div>
+      <div class="sets-row">${setsHtml}</div>
+    </div>
+  `;
+}
+
+function render() {
+  if (!plan) return;
+
+  const totalSemana = plan.reduce((acc, { sesion }) => acc + sesion.kcal, 0);
+  totalWeekEl.style.display = "flex";
+  totalWeekValEl.textContent = `~${totalSemana} kcal`;
+  footnoteEl.style.display = "block";
+
+  planEl.innerHTML = plan.map(({ dia, sesion }, index) => `
+    <div class="day-card" data-day-index="${index}">
+      <div class="day-head">
+        <div>
+          <div class="dia-full">${dia.full}</div>
+          <div class="sesion-nombre">${sesion.nombre}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="kcal-box">
+            <div class="num">~${sesion.kcal}</div>
+            <div class="lbl">kcal</div>
+          </div>
+          <button class="regen-btn" data-regen="${index}">↻ Variar</button>
+        </div>
+      </div>
+      <div class="row warmup">
+        <span>🏃 ${sesion.calentamiento.nombre}</span>
+        <span class="detalle">${sesion.calentamiento.detalle}</span>
+      </div>
+      ${sesion.ejercicios.map((ej, i) => filaEjercicioHTML(ej, i)).join("")}
+      <div class="abs-label">Abdominales</div>
+      ${sesion.abdominales.map((ej) => filaEjercicioHTML(ej, null)).join("")}
+    </div>
+  `).join("");
+
+  // Listeners: guardar peso al salir del campo (uno por cada serie)
+  planEl.querySelectorAll("input[data-slug]").forEach((input) => {
+    input.addEventListener("blur", () => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val) && val > 0) {
+        const key = `${input.dataset.slug}:s${input.dataset.set}`;
+        guardarPesoLocal(key, val);
+        input.classList.add("saved");
+        setTimeout(() => input.classList.remove("saved"), 1200);
+        // actualizar el hint "sub" del ejercicio con los pesos de todas sus series
+        const row = input.closest(".row");
+        const sub = row.querySelector(`[data-sub="${input.dataset.slug}"]`);
+        if (sub) {
+          const nSeries = parseInt(row.dataset.exseries, 10);
+          const baseTxt = sub.textContent.split(" · última vez")[0];
+          sub.textContent = baseTxt + formatUltimaVez(input.dataset.slug, nSeries);
+        }
+      }
+    });
+  });
+
+  // Listeners: variar ejercicios de un día
+  planEl.querySelectorAll("[data-regen]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.dataset.regen, 10);
+      plan[idx].sesion = generarSesion(plan[idx].sesion.nombre);
+      render();
+    });
+  });
+}
+</script>
+</body>
+</html>
