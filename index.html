@@ -8,159 +8,224 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#1C1B1A; --card:#262422; --card2:#2A2826; --border:#3D3A36; --rowborder:#322F2C;
+    --text:#EDEAE3; --muted:#9A948A; --muted2:#7d786f; --accent:#E8B93A; --onaccent:#1C1B1A;
+    --danger:#E0725A; --success:#8FBF5C; --inputbg:#1C1B1A;
+  }
+  html.light-theme {
+    --bg:#F3EEE3; --card:#FFFFFF; --card2:#F1EBDD; --border:#DDD5C2; --rowborder:#EAE3D3;
+    --text:#2B2620; --muted:#6C6455; --muted2:#89806E; --accent:#E8B93A; --onaccent:#1C1B1A;
+    --danger:#C24E36; --success:#3F7A34; --inputbg:#FFFFFF;
+  }
   body {
-    background: #1C1B1A;
-    color: #EDEAE3;
+    background: var(--bg); color: var(--text);
     font-family: 'Barlow', system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
   }
   .oswald { font-family: 'Oswald', sans-serif; }
   .wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 60px; }
   .badge {
-    display: inline-block; background: #E8B93A; color: #1C1B1A;
+    display: inline-block; background: var(--accent); color: var(--onaccent);
     font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
     padding: 4px 10px; margin-bottom: 12px; text-transform: uppercase;
   }
   h1 { font-size: 36px; font-weight: 700; line-height: 1.05; }
-  .subtitle { color: #9A948A; margin-top: 10px; font-size: 15px; line-height: 1.5; }
+  h2 { font-size: 24px; font-weight: 700; font-family: 'Oswald', sans-serif; margin-bottom: 16px; }
+  .subtitle { color: var(--muted); margin-top: 10px; font-size: 15px; line-height: 1.5; }
   .section-label {
-    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #9A948A;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted);
     margin-bottom: 10px; text-transform: uppercase; font-family: 'Oswald', sans-serif;
   }
-  .check-row {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px; cursor: pointer;
+  .tema-btn {
+    position: fixed; top: 14px; right: 14px; z-index: 50; background: var(--card);
+    border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px;
+    border-radius: 50%; font-size: 16px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
   }
+  .check-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; cursor: pointer; }
   .switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
   .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
   .switch-track {
-    position: absolute; inset: 0; background-color: #3D3A36; border-radius: 999px;
+    position: absolute; inset: 0; background-color: var(--border); border-radius: 999px;
     transition: background-color 0.2s ease; cursor: pointer;
   }
   .switch-track::before {
     content: ""; position: absolute; height: 20px; width: 20px; left: 3px; top: 3px;
-    background-color: #EDEAE3; border-radius: 50%; transition: transform 0.2s ease;
+    background-color: var(--text); border-radius: 50%; transition: transform 0.2s ease;
     box-shadow: 0 1px 3px rgba(0,0,0,0.4);
   }
-  .switch input:checked + .switch-track { background-color: #E8B93A; }
-  .switch input:checked + .switch-track::before { transform: translateX(18px); background-color: #1C1B1A; }
-  .switch-label { font-size: 14px; color: #EDEAE3; }
+  .switch input:checked + .switch-track { background-color: var(--accent); }
+  .switch input:checked + .switch-track::before { transform: translateX(18px); background-color: var(--onaccent); }
+  .switch-label { font-size: 14px; color: var(--text); }
   .days { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
   .peso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
   .peso-row input {
-    width: 80px; background: #262422; border: 2px solid #3D3A36; border-radius: 8px;
-    color: #EDEAE3; padding: 10px 12px; font-size: 15px; font-family: 'Barlow', sans-serif; text-align: center;
+    width: 80px; background: var(--card); border: 2px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 10px 12px; font-size: 15px; font-family: 'Barlow', sans-serif; text-align: center;
   }
-  .peso-row span { color: #9A948A; font-size: 14px; }
+  .peso-row span { color: var(--muted); font-size: 14px; }
   .peso-view {
     display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
-    background: #262422; border: 1px solid #3D3A36; border-radius: 8px; padding: 10px 14px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;
   }
-  .peso-view span { color: #EDEAE3; font-size: 14px; }
-  .peso-view a { color: #E8B93A; font-size: 13px; font-weight: 600; text-decoration: none; }
+  .peso-view span { color: var(--text); font-size: 14px; }
+  .peso-view a { color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; }
   .peso-view a:hover { text-decoration: underline; }
-  .peso-error { color: #E0725A; font-size: 12px; margin: -12px 0 20px; }
+  .peso-error { color: var(--danger); font-size: 12px; margin: -12px 0 20px; }
   .app-footer {
-    text-align: center; color: #6b6660; font-size: 11px; padding: 24px 20px 32px;
-    border-top: 1px solid #2A2826; margin-top: 8px;
+    text-align: center; color: var(--muted2); font-size: 11px; padding: 24px 20px 32px;
+    border-top: 1px solid var(--card2); margin-top: 8px;
   }
   .day-chip {
-    cursor: pointer; border: 2px solid #3D3A36; background: #262422; color: #EDEAE3;
+    cursor: pointer; border: 2px solid var(--border); background: var(--card); color: var(--text);
     border-radius: 8px; padding: 10px 16px; font-weight: 600; font-size: 14px;
     font-family: 'Barlow', sans-serif; transition: all 0.15s ease;
   }
   .day-chip:hover { transform: translateY(-2px); }
-  .day-chip.active { border-color: #E8B93A; background: #E8B93A; color: #1C1B1A; }
+  .day-chip.active { border-color: var(--accent); background: var(--accent); color: var(--onaccent); }
   .gen-btn {
-    width: 100%; padding: 16px; background: #E8B93A; color: #1C1B1A; border: none;
+    width: 100%; padding: 16px; background: var(--accent); color: var(--onaccent); border: none;
     border-radius: 8px; font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
     text-transform: uppercase; cursor: pointer; margin-bottom: 20px; font-family: 'Oswald', sans-serif;
   }
-  .gen-btn:disabled { background: #3D3A36; color: #9A948A; cursor: not-allowed; }
+  .gen-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
   .gen-btn:active:not(:disabled) { transform: scale(0.98); }
+  .racha-badge {
+    display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; font-size: 13px; color: var(--text);
+  }
+  .undo-box {
+    display: flex; justify-content: space-between; align-items: center; background: var(--card);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
+    font-size: 13px; color: var(--muted);
+  }
+  .undo-box button {
+    background: transparent; border: 1px solid var(--border); color: var(--accent);
+    border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif;
+  }
+  .progress-link-btn {
+    display: block; width: 100%; text-align: center; background: var(--card); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600;
+    cursor: pointer; margin-bottom: 20px; font-family: 'Barlow', sans-serif;
+  }
+  .progress-link-btn:hover { border-color: var(--accent); color: var(--accent); }
   .total-week {
     display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-    padding: 10px 14px; background: #262422; border: 1px solid #3D3A36; border-radius: 8px; font-size: 13px;
+    padding: 10px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;
   }
-  .total-week span.val { color: #E8B93A; font-weight: 700; font-size: 16px; font-family: 'Oswald', sans-serif; }
-  .day-card { background: #262422; border: 1px solid #3D3A36; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .total-week span.val { color: var(--accent); font-weight: 700; font-size: 16px; font-family: 'Oswald', sans-serif; }
+  .day-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
   .day-head {
     display: flex; justify-content: space-between; align-items: center; padding: 14px 18px;
-    border-bottom: 1px solid #3D3A36; background: #2A2826;
+    border-bottom: 1px solid var(--border); background: var(--card2); gap: 10px; flex-wrap: wrap;
   }
-  .day-head .dia-full { font-size: 12px; color: #E8B93A; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
+  .day-head .dia-full { font-size: 12px; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
   .day-head .sesion-nombre { font-size: 19px; font-weight: 600; font-family: 'Oswald', sans-serif; }
   .kcal-box { text-align: right; }
   .kcal-box .num { font-size: 15px; font-weight: 700; font-family: 'Oswald', sans-serif; }
-  .kcal-box .lbl { font-size: 10px; color: #7d786f; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kcal-box .lbl { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.05em; }
   .regen-btn {
-    background: transparent; border: 1px solid #3D3A36; color: #9A948A; border-radius: 6px;
+    background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 6px;
     padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif; white-space: nowrap;
   }
-  .regen-btn:hover { background: #3D3A36; }
+  .regen-btn:hover { background: var(--border); }
+  .hecho-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif; white-space: nowrap;
+  }
+  .hecho-btn.done { background: var(--success); border-color: var(--success); color: var(--onaccent); font-weight: 700; }
+  .warning-badge { font-size: 11px; color: var(--danger); padding: 6px 18px 0; }
   .row {
     display: flex; flex-direction: column; padding: 10px 18px;
-    font-size: 14px; border-bottom: 1px solid #322F2C; gap: 6px;
+    font-size: 14px; border-bottom: 1px solid var(--rowborder); gap: 6px;
   }
   .row.warmup { flex-direction: row; justify-content: space-between; align-items: center; }
-  .row:hover { background: rgba(232, 185, 58, 0.06); }
-  .row.warmup { color: #9A948A; }
+  .row:hover { background: rgba(232, 185, 58, 0.07); }
+  .row.warmup { color: var(--muted); }
   .row.warmup .detalle { font-style: italic; }
   .row .info { min-width: 0; }
-  .row .sub { color: #7d786f; font-size: 12px; margin-top: 2px; }
+  .row .sub { color: var(--muted2); font-size: 12px; margin-top: 2px; }
+  .row .suggestion { color: var(--success); font-size: 11px; margin-top: 2px; }
   .machine-tag {
     margin-left: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
-    color: #E8B93A; border: 1px solid #4a4230; border-radius: 4px; padding: 1px 5px; vertical-align: middle;
+    color: var(--accent); border: 1px solid rgba(232,185,58,0.35); border-radius: 4px; padding: 1px 5px; vertical-align: middle;
+  }
+  .edit-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 6px;
+    padding: 2px 7px; font-size: 11px; cursor: pointer; margin-left: 6px; font-family: 'Barlow', sans-serif;
+  }
+  .edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .edit-select-row { display: none; gap: 6px; margin-top: 6px; }
+  .edit-select-row.open { display: flex; }
+  .edit-select-row select {
+    flex: 1; min-width: 0; background: var(--inputbg); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 6px; font-size: 12px; font-family: 'Barlow', sans-serif;
+  }
+  .edit-select-row button {
+    background: var(--border); border: none; color: var(--text); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif;
   }
   .sets-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .set-box { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-  .set-box .set-lbl { font-size: 9px; color: #7d786f; text-transform: uppercase; letter-spacing: 0.05em; }
+  .set-box .set-lbl { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.05em; }
   .set-box input {
-    width: 46px; background: #1C1B1A; border: 1px solid #3D3A36; border-radius: 6px;
-    color: #EDEAE3; padding: 6px 4px; font-size: 13px; text-align: center; font-family: 'Barlow', sans-serif;
+    width: 46px; background: var(--inputbg); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); padding: 6px 4px; font-size: 13px; text-align: center; font-family: 'Barlow', sans-serif;
   }
-  .set-box input.saved { border-color: #8FBF5C; }
+  .set-box input.saved { border-color: var(--success); }
   .abs-label {
-    padding: 10px 18px 4px; font-size: 11px; color: #E8B93A; font-weight: 700;
+    padding: 10px 18px 4px; font-size: 11px; color: var(--accent); font-weight: 700;
     letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Oswald', sans-serif;
   }
-  .footnote { color: #7d786f; font-size: 12px; margin-top: 20px; line-height: 1.5; }
+  .footnote { color: var(--muted2); font-size: 12px; margin-top: 20px; line-height: 1.5; }
   .code-box {
-    background: #262422; border: 1px solid #E8B93A; border-radius: 8px;
+    background: var(--card); border: 1px solid var(--accent); border-radius: 8px;
     padding: 14px 16px; margin-bottom: 20px; text-align: center;
   }
-  .code-box.stale { border-color: #3D3A36; }
-  .code-box .code-lbl {
-    font-size: 11px; color: #9A948A; text-transform: uppercase; letter-spacing: 0.08em;
-    font-family: 'Oswald', sans-serif;
-  }
-  .code-box .code-value {
-    font-size: 30px; font-weight: 700; color: #E8B93A; letter-spacing: 0.12em; margin: 4px 0;
-  }
-  .code-box.stale .code-value { color: #7d786f; font-size: 20px; }
-  .code-box .code-note { font-size: 12px; color: #9A948A; line-height: 1.4; }
+  .code-box.stale { border-color: var(--border); }
+  .code-box .code-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Oswald', sans-serif; }
+  .code-box .code-value { font-size: 30px; font-weight: 700; color: var(--accent); letter-spacing: 0.12em; margin: 4px 0; }
+  .code-box.stale .code-value { color: var(--muted2); font-size: 20px; }
+  .code-box .code-note { font-size: 12px; color: var(--muted); line-height: 1.4; }
   .load-code { margin-bottom: 24px; }
   .load-code-row { display: flex; gap: 8px; }
   .load-code-row input {
-    flex: 1; min-width: 0; background: #262422; border: 1px solid #3D3A36; border-radius: 8px;
-    color: #EDEAE3; padding: 12px 14px; font-size: 16px; letter-spacing: 0.1em; text-align: center;
+    flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 12px 14px; font-size: 16px; letter-spacing: 0.1em; text-align: center;
     font-family: 'Barlow', sans-serif;
   }
   .load-code-row button {
-    background: #262422; border: 1px solid #3D3A36; color: #EDEAE3; border-radius: 8px;
+    background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 8px;
     padding: 0 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
     font-family: 'Barlow', sans-serif;
   }
-  .load-code-row button:hover { border-color: #E8B93A; color: #E8B93A; }
-  .code-error { color: #E0725A; font-size: 12px; margin-top: 6px; }
+  .load-code-row button:hover { border-color: var(--accent); color: var(--accent); }
+  .code-error { color: var(--danger); font-size: 12px; margin-top: 6px; }
+  .progress-back {
+    color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600;
+    display: inline-block; margin-bottom: 16px; cursor: pointer; background: none; border: none;
+    font-family: 'Barlow', sans-serif; padding: 0;
+  }
+  .progress-select {
+    width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 12px; font-size: 15px; margin-bottom: 20px; font-family: 'Barlow', sans-serif;
+  }
+  .progress-chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .progress-empty { color: var(--muted); font-size: 14px; text-align: center; padding: 40px 20px; }
   @media (max-width: 480px) { h1 { font-size: 28px; } }
 </style>
 </head>
 <body>
 
-<div class="wrap">
+<button class="tema-btn" id="temaBtn" aria-label="Cambiar tema">🌙</button>
+
+<div class="wrap" id="mainView">
   <div class="badge">Cinta 10' → Fuerza → Abdominales</div>
   <h1 class="oswald">GENERADOR<br/>DE ENTRENOS</h1>
   <p class="subtitle">Elige los días que entrenas. Anota el peso que uses en cada ejercicio y la próxima vez que te toque verás con qué kilos empezaste la última vez.</p>
+
+  <div class="racha-badge" id="rachaBadge" style="display:none;"></div>
 
   <label class="check-row">
     <span class="switch">
@@ -193,6 +258,11 @@
 
   <button class="gen-btn oswald" id="genBtn" disabled>Generar entrenamientos</button>
 
+  <div class="undo-box" id="undoBox" style="display:none;">
+    <span>Has cambiado un ejercicio.</span>
+    <button id="undoBtn">↩ Deshacer</button>
+  </div>
+
   <div class="code-box" id="codeBox" style="display:none;">
     <div class="code-lbl">Tu código para compartir</div>
     <div class="code-value oswald">000000</div>
@@ -213,6 +283,8 @@
     <span class="val" id="totalWeekVal">~0 kcal</span>
   </div>
 
+  <button class="progress-link-btn" id="progressLinkBtn" style="display:none;">📈 Ver progreso</button>
+
   <div id="plan"></div>
 
   <p class="footnote" id="footnote" style="display:none;">
@@ -222,6 +294,15 @@
     Las calorías se calculan con tu peso corporal y una estimación de esfuerzo (MET) por tipo de
     ejercicio y descanso entre series — es una aproximación razonable, no una medición exacta.
   </p>
+</div>
+
+<div class="wrap" id="progressView" style="display:none;">
+  <button class="progress-back" id="progressBackBtn">← Volver</button>
+  <h2>Tu progreso</h2>
+  <select class="progress-select" id="progressSelect"></select>
+  <div class="progress-chart-card">
+    <canvas id="progressCanvas" width="600" height="240" style="width:100%; height:auto; display:block;"></canvas>
+  </div>
 </div>
 
 <footer class="app-footer">
@@ -375,11 +456,27 @@ const ABDOMINALES = [
 ];
 
 const PRIORIDAD_PESOS = {
-  maquina: { m: 3, l: 1 },     // prioriza máquina/polea
-  equilibrado: { m: 1, l: 1 }, // sin preferencia
-  libre: { m: 1, l: 3 },       // prioriza peso libre
+  maquina: { m: 3, l: 1 },
+  equilibrado: { m: 1, l: 1 },
+  libre: { m: 1, l: 3 },
 };
-const PRIORIDAD_ORDEN = ["maquina", "equilibrado", "libre"]; // para codificar en el código
+const PRIORIDAD_ORDEN = ["maquina", "equilibrado", "libre"];
+
+// Mapa slug -> nombre "bonito" y slug -> conjunto de grupos musculares a los que pertenece.
+// Se usa para: listar ejercicios editables, sugerir referencias de peso de otro ejercicio
+// del mismo grupo, y poblar el selector de la vista de progreso.
+const SLUG_A_NOMBRE = {};
+const SLUG_A_GRUPOS = {};
+function registrarEjercicio(nombre, grupo) {
+  const slug = slugify(nombre);
+  SLUG_A_NOMBRE[slug] = nombre;
+  if (!SLUG_A_GRUPOS[slug]) SLUG_A_GRUPOS[slug] = new Set();
+  SLUG_A_GRUPOS[slug].add(grupo);
+}
+function construirMapasEjercicios() {
+  Object.entries(POOLS).forEach(([grupo, arr]) => arr.forEach((e) => registrarEjercicio(e.n, grupo)));
+  ABDOMINALES.forEach((e) => registrarEjercicio(e.n, "abs"));
+}
 
 function pickPriorizandoMaquinas(pool, n, rng, pesos) {
   const copy = pool.map((e) => ({ ...e }));
@@ -406,9 +503,6 @@ function repsFor(nombre, rng) {
   return { series: 3 + (rng() > 0.5 ? 1 : 0), reps: ["8-10", "10-12", "12-15"][Math.floor(rng() * 3)] };
 }
 
-// Generador de números pseudoaleatorios determinista (mulberry32).
-// Con la misma "semilla" numérica produce siempre la misma secuencia,
-// lo que permite reconstruir un entrenamiento idéntico a partir de un código.
 function crearRng(semilla) {
   let a = semilla >>> 0;
   return function () {
@@ -424,23 +518,14 @@ function slugify(nombre) {
     .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-// Estimación de kcal basada en MET (equivalente metabólico) x peso x tiempo,
-// que es el estándar habitual para estimar gasto calórico:
-//   kcal/min = MET x 3.5 x peso(kg) / 200
-// El tiempo por serie incluye el propio esfuerzo + el descanso entre series.
 function kcalPorMinuto(met, pesoKg) { return (met * 3.5 * pesoKg) / 200; }
-
 function kcalSetPrincipal(ej, pesoKg) {
-  const met = ej.c ? 6 : 3.5;          // compuesto = más músculo implicado = más esfuerzo
-  const minutos = ej.c ? 2.25 : 2;     // incluye descanso entre series
+  const met = ej.c ? 6 : 3.5;
+  const minutos = ej.c ? 2.25 : 2;
   return kcalPorMinuto(met, pesoKg) * minutos;
 }
-function kcalSetAbs(pesoKg) {
-  return kcalPorMinuto(4, pesoKg) * 1; // series de abs: más cortas, menos descanso
-}
-function kcalCalentamiento(pesoKg) {
-  return kcalPorMinuto(5, pesoKg) * 10; // 10 min de cinta a ritmo moderado
-}
+function kcalSetAbs(pesoKg) { return kcalPorMinuto(4, pesoKg) * 1; }
+function kcalCalentamiento(pesoKg) { return kcalPorMinuto(5, pesoKg) * 10; }
 function kcalSesion(sesion, pesoKg) {
   const calentamiento = kcalCalentamiento(pesoKg);
   const principal = sesion.ejercicios.reduce((acc, ej) => acc + ej.series * kcalSetPrincipal(ej, pesoKg), 0);
@@ -454,8 +539,9 @@ function generarSesion(nombreSesion, rng, pesos) {
   const nEjercicios = grupo === "full" ? 6 : 7;
   const elegidos = pickPriorizandoMaquinas(pool, nEjercicios, rng, pesos);
   const abs = pickPriorizandoMaquinas(ABDOMINALES, 3, rng, pesos);
-  const sesion = {
+  return {
     nombre: nombreSesion,
+    grupo: grupo,
     calentamiento: { nombre: "Cinta / cardio suave", detalle: "10 min, ritmo cómodo para elevar pulsaciones" },
     ejercicios: elegidos.map((ej) => ({ nombre: ej.n, maquina: ej.m, c: ej.c, ...repsFor(ej.n, rng) })),
     abdominales: abs.map((ej) => ({
@@ -463,13 +549,8 @@ function generarSesion(nombreSesion, rng, pesos) {
       reps: ej.n.includes("Plancha") || ej.n.includes("Hollow") ? "30-45 seg" : "12-15",
     })),
   };
-  return sesion;
 }
 
-// ---- Código compartido de 6 dígitos ----
-// El código codifica: qué días están seleccionados (bitmask), la prioridad
-// máquina/libre elegida, y una parte aleatoria que sirve de semilla.
-// Con el mismo código se reconstruye exactamente el mismo entrenamiento.
 function calcularBitmask(seleccion) {
   let mask = 0;
   DIAS.forEach((d, i) => { if (seleccion.includes(d.id)) mask |= (1 << i); });
@@ -478,8 +559,6 @@ function calcularBitmask(seleccion) {
 function decodificarBitmask(mask) {
   return DIAS.filter((d, i) => mask & (1 << i)).map((d) => d.id);
 }
-// Calcula un identificador de semana ISO (año*100 + nº de semana), para que la parte
-// "aleatoria" del código dependa de la semana en curso y no cambie hasta la semana siguiente.
 function calcularSemanaId(fecha) {
   const d = new Date(Date.UTC(fecha.getFullYear(), fecha.getMonth(), fecha.getDate()));
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
@@ -487,13 +566,12 @@ function calcularSemanaId(fecha) {
   const semana = Math.ceil((((d - inicioAno) / 86400000) + 1) / 7);
   return d.getUTCFullYear() * 100 + semana;
 }
-
 function generarCodigo(seleccion, prioridad) {
-  const bitmask = calcularBitmask(seleccion); // 1-127
-  const pIdx = PRIORIDAD_ORDEN.indexOf(prioridad); // 0-2
-  const meta = (bitmask - 1) * 3 + pIdx; // 0-380
-  const seedPart = calcularSemanaId(new Date()) % 2600; // misma semana = mismo valor
-  return meta * 2600 + seedPart; // máx 990599, cabe en 6 dígitos
+  const bitmask = calcularBitmask(seleccion);
+  const pIdx = PRIORIDAD_ORDEN.indexOf(prioridad);
+  const meta = (bitmask - 1) * 3 + pIdx;
+  const seedPart = calcularSemanaId(new Date()) % 2600;
+  return meta * 2600 + seedPart;
 }
 function construirPlanDesdeCodigo(codigo) {
   const meta = Math.floor(codigo / 2600);
@@ -514,20 +592,70 @@ function construirPlanDesdeCodigo(codigo) {
   };
 }
 
-// ---- Persistencia local (localStorage) ----
-function getPesoGuardado(slug) {
+// ---- Historial de pesos por serie (array, no un único valor) ----
+// Clave: "serie:<slug>:s<N>" -> [{date, weight}, ...] ordenado por fecha ascendente.
+function getHistorialSet(slug, n) {
   try {
-    const raw = localStorage.getItem("peso:" + slug);
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) { return null; }
+    const raw = localStorage.getItem(`serie:${slug}:s${n}`);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) { return []; }
 }
-function guardarPesoLocal(slug, weight) {
-  const dato = { weight, date: new Date().toISOString().slice(0, 10) };
-  localStorage.setItem("peso:" + slug, JSON.stringify(dato));
-  return dato;
+function guardarEnHistorialSet(slug, n, weight) {
+  const arr = getHistorialSet(slug, n);
+  const hoy = new Date().toISOString().slice(0, 10);
+  const idx = arr.findIndex((e) => e.date === hoy);
+  if (idx >= 0) arr[idx].weight = weight;
+  else arr.push({ date: hoy, weight });
+  arr.sort((a, b) => (a.date > b.date ? 1 : -1));
+  const recortado = arr.slice(-12);
+  localStorage.setItem(`serie:${slug}:s${n}`, JSON.stringify(recortado));
+  return recortado;
+}
+function ultimaEntrada(slug, n) {
+  const arr = getHistorialSet(slug, n);
+  return arr.length ? arr[arr.length - 1] : null;
 }
 
-// Peso corporal del usuario: se pide una vez y se recuerda en este dispositivo.
+// Referencia de otro ejercicio del mismo grupo muscular cuando el actual no tiene historial propio.
+function buscarReferenciaGrupo(slugActual) {
+  const gruposActual = SLUG_A_GRUPOS[slugActual];
+  if (!gruposActual) return null;
+  let mejor = null;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith("serie:")) continue;
+    const partes = k.slice("serie:".length).split(":s");
+    const slugOtro = partes[0];
+    if (slugOtro === slugActual) continue;
+    const gruposOtro = SLUG_A_GRUPOS[slugOtro];
+    if (!gruposOtro) continue;
+    let comparten = false;
+    for (const g of gruposActual) if (gruposOtro.has(g)) { comparten = true; break; }
+    if (!comparten) continue;
+    try {
+      const arr = JSON.parse(localStorage.getItem(k));
+      if (arr && arr.length) {
+        const ultimo = arr[arr.length - 1];
+        if (!mejor || ultimo.date > mejor.date) mejor = { ...ultimo, slug: slugOtro };
+      }
+    } catch (e) {}
+  }
+  return mejor;
+}
+
+// Sugerencia de progresión: si las 2 últimas veces se usó el mismo peso, sugiere subir un poco.
+function sugerenciaProgresion(slug, n) {
+  const arr = getHistorialSet(slug, n);
+  if (arr.length < 2) return null;
+  const ultimas = arr.slice(-2);
+  if (ultimas[0].weight === ultimas[1].weight) {
+    const siguiente = Math.round((ultimas[1].weight + 2.5) * 2) / 2;
+    return `💡 llevas igual 2 veces, prueba ${siguiente} kg`;
+  }
+  return null;
+}
+
+// ---- Peso corporal del usuario ----
 function getPesoUsuarioGuardado() {
   try {
     const raw = localStorage.getItem("perfil:peso");
@@ -538,13 +666,69 @@ function guardarPesoUsuario(valor) {
   localStorage.setItem("perfil:peso", JSON.stringify(valor));
 }
 
+// ---- Marcar entrenamiento hecho + racha de semanas ----
+function marcarHecho(semanaId, indice) {
+  localStorage.setItem(`hecho:${semanaId}:${indice}`, "1");
+}
+function desmarcarHecho(semanaId, indice) {
+  localStorage.removeItem(`hecho:${semanaId}:${indice}`);
+}
+function estaHecho(semanaId, indice) {
+  return localStorage.getItem(`hecho:${semanaId}:${indice}`) === "1";
+}
+function calcularRachaSemanas() {
+  const semanas = new Set();
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith("hecho:")) {
+      const semanaId = parseInt(k.split(":")[1], 10);
+      if (!isNaN(semanaId)) semanas.add(semanaId);
+    }
+  }
+  if (semanas.size === 0) return 0;
+  const actual = calcularSemanaId(new Date());
+  let racha = 0;
+  let esperado = actual;
+  const ordenadas = [...semanas].sort((a, b) => b - a);
+  for (const s of ordenadas) {
+    if (s === esperado) { racha++; esperado--; }
+    else if (s > esperado) { continue; }
+    else break;
+  }
+  return racha;
+}
+// Fecha real (dentro de la semana en curso) que le corresponde a una posición Lun..Dom.
+function fechaParaIndiceSemana(diaIndex) {
+  const hoy = new Date();
+  const diaSemanaHoy = (hoy.getDay() + 6) % 7;
+  const lunes = new Date(hoy);
+  lunes.setHours(0, 0, 0, 0);
+  lunes.setDate(hoy.getDate() - diaSemanaHoy);
+  const fecha = new Date(lunes);
+  fecha.setDate(lunes.getDate() + diaIndex);
+  return fecha;
+}
+
+// ---- Tema claro/oscuro ----
+function getTemaGuardado() {
+  return localStorage.getItem("tema");
+}
+function guardarTema(valor) {
+  localStorage.setItem("tema", valor);
+}
+
+construirMapasEjercicios();
+
 // ---- Estado ----
 let seleccionados = [];
 let prioridad = "maquina";
 let plan = null;
 let codigoActual = null;
 let codigoDesactualizado = false;
+let ultimoSnapshot = null;
 
+const mainViewEl = document.getElementById("mainView");
+const progressViewEl = document.getElementById("progressView");
 const daysEl = document.getElementById("days");
 const prioEl = document.getElementById("prioridad");
 const genBtn = document.getElementById("genBtn");
@@ -563,9 +747,36 @@ const pesoViewEl = document.getElementById("pesoView");
 const pesoViewTextEl = document.getElementById("pesoViewText");
 const pesoEditEl = document.getElementById("pesoEdit");
 const pesoModificarLinkEl = document.getElementById("pesoModificarLink");
+const rachaBadgeEl = document.getElementById("rachaBadge");
+const undoBoxEl = document.getElementById("undoBox");
+const undoBtnEl = document.getElementById("undoBtn");
+const progressLinkBtnEl = document.getElementById("progressLinkBtn");
+const progressBackBtnEl = document.getElementById("progressBackBtn");
+const progressSelectEl = document.getElementById("progressSelect");
+const progressCanvasEl = document.getElementById("progressCanvas");
+const temaBtnEl = document.getElementById("temaBtn");
 
+// ---- Tema ----
+function aplicarTema(tema) {
+  if (tema === "light") {
+    document.documentElement.classList.add("light-theme");
+    temaBtnEl.textContent = "☀️";
+  } else {
+    document.documentElement.classList.remove("light-theme");
+    temaBtnEl.textContent = "🌙";
+  }
+}
+let temaActual = getTemaGuardado() || "dark";
+aplicarTema(temaActual);
+temaBtnEl.addEventListener("click", () => {
+  temaActual = temaActual === "light" ? "dark" : "light";
+  guardarTema(temaActual);
+  aplicarTema(temaActual);
+  if (plan) dibujarGraficaSiVisible();
+});
+
+// ---- Peso corporal ----
 let pesoUsuarioActual = getPesoUsuarioGuardado();
-
 function mostrarPesoVista(valor) {
   pesoViewTextEl.textContent = `Peso guardado: ${valor} kg`;
   pesoViewEl.style.display = "flex";
@@ -583,18 +794,10 @@ function guardarYMostrarPeso(valor) {
   mostrarPesoVista(valor);
   pesoErrorEl.style.display = "none";
 }
+if (pesoUsuarioActual) mostrarPesoVista(pesoUsuarioActual);
+else mostrarPesoEdicion();
 
-if (pesoUsuarioActual) {
-  mostrarPesoVista(pesoUsuarioActual);
-} else {
-  mostrarPesoEdicion();
-}
-
-pesoModificarLinkEl.addEventListener("click", (e) => {
-  e.preventDefault();
-  mostrarPesoEdicion();
-});
-
+pesoModificarLinkEl.addEventListener("click", (e) => { e.preventDefault(); mostrarPesoEdicion(); });
 pesoUsuarioEl.addEventListener("change", () => {
   const val = parseFloat(pesoUsuarioEl.value);
   if (!isNaN(val) && val > 0) {
@@ -606,7 +809,6 @@ pesoUsuarioEl.addEventListener("change", () => {
 const calcularCalCheckEl = document.getElementById("calcularCalCheck");
 const pesoSectionEl = document.getElementById("pesoSection");
 let calcularCalorias = calcularCalCheckEl.checked;
-
 calcularCalCheckEl.addEventListener("change", () => {
   calcularCalorias = calcularCalCheckEl.checked;
   pesoSectionEl.style.display = calcularCalorias ? "block" : "none";
@@ -614,6 +816,7 @@ calcularCalCheckEl.addEventListener("change", () => {
   if (plan) render();
 });
 
+// ---- Chips de días y prioridad ----
 DIAS.forEach((d) => {
   const btn = document.createElement("button");
   btn.className = "day-chip";
@@ -671,6 +874,7 @@ genBtn.onclick = () => {
   plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos) }));
   codigoActual = codigo;
   codigoDesactualizado = false;
+  ultimoSnapshot = null;
   genBtn.textContent = "Generar de nuevo";
   render();
 };
@@ -704,44 +908,217 @@ loadCodeBtn.onclick = () => {
   plan = resultado.plan;
   codigoActual = val;
   codigoDesactualizado = false;
+  ultimoSnapshot = null;
   genBtn.textContent = "Generar de nuevo";
   render();
 };
 
 document.getElementById("copyrightYear").textContent = "© " + new Date().getFullYear();
 
+// ---- Racha semanal ----
+function actualizarRachaBadge() {
+  const racha = calcularRachaSemanas();
+  if (racha > 0) {
+    rachaBadgeEl.style.display = "flex";
+    rachaBadgeEl.innerHTML = `🔥 <span>Llevas <strong>${racha}</strong> semana${racha === 1 ? "" : "s"} seguida${racha === 1 ? "" : "s"} entrenando</span>`;
+  } else {
+    rachaBadgeEl.style.display = "none";
+  }
+}
+
+// ---- Deshacer último cambio ----
+function guardarSnapshot() {
+  ultimoSnapshot = JSON.parse(JSON.stringify(plan));
+}
+undoBtnEl.addEventListener("click", () => {
+  if (!ultimoSnapshot) return;
+  plan = ultimoSnapshot;
+  ultimoSnapshot = null;
+  codigoDesactualizado = true;
+  render();
+});
+
+// ---- Navegación a la vista de progreso ----
+function hayDatosDeProgreso() {
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith("serie:")) return true;
+  }
+  return false;
+}
+function listaEjerciciosConHistorial() {
+  const slugs = new Set();
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith("serie:")) {
+      const slug = k.slice("serie:".length).split(":s")[0];
+      slugs.add(slug);
+    }
+  }
+  return [...slugs]
+    .map((slug) => ({ slug, nombre: SLUG_A_NOMBRE[slug] || slug }))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+}
+function abrirProgreso() {
+  const lista = listaEjerciciosConHistorial();
+  if (lista.length === 0) return;
+  progressSelectEl.innerHTML = lista.map((e) => `<option value="${e.slug}">${e.nombre}</option>`).join("");
+  mainViewEl.style.display = "none";
+  progressViewEl.style.display = "block";
+  window.scrollTo(0, 0);
+  dibujarGraficaSiVisible();
+}
+function cerrarProgreso() {
+  progressViewEl.style.display = "none";
+  mainViewEl.style.display = "block";
+  window.scrollTo(0, 0);
+}
+progressLinkBtnEl.addEventListener("click", abrirProgreso);
+progressBackBtnEl.addEventListener("click", cerrarProgreso);
+progressSelectEl.addEventListener("change", dibujarGraficaSiVisible);
+
+// ---- Dibujar la gráfica de progreso en canvas ----
+function colorVar(nombre) {
+  return getComputedStyle(document.documentElement).getPropertyValue(nombre).trim();
+}
+function dibujarGraficaSiVisible() {
+  if (progressViewEl.style.display === "none") return;
+  const slug = progressSelectEl.value;
+  if (!slug) return;
+  // Combina el histórico de todas las series guardadas de este ejercicio, usando por
+  // fecha el peso más alto registrado entre sus series (la serie más exigente del día).
+  const porFecha = {};
+  for (let n = 0; n < 6; n++) {
+    getHistorialSet(slug, n).forEach((e) => {
+      if (!porFecha[e.date] || e.weight > porFecha[e.date]) porFecha[e.date] = e.weight;
+    });
+  }
+  const datos = Object.entries(porFecha).map(([date, weight]) => ({ date, weight })).sort((a, b) => (a.date > b.date ? 1 : -1));
+  dibujarGrafica(progressCanvasEl, datos);
+}
+function dibujarGrafica(canvas, datos) {
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  const muted = colorVar("--muted2") || "#7d786f";
+  const border = colorVar("--rowborder") || "#322F2C";
+  const accent = colorVar("--accent") || "#E8B93A";
+  const text = colorVar("--text") || "#EDEAE3";
+  if (!datos || datos.length === 0) {
+    ctx.fillStyle = muted;
+    ctx.font = "14px Barlow, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Todavía no hay suficientes datos para este ejercicio.", w / 2, h / 2);
+    return;
+  }
+  const pad = { left: 44, right: 16, top: 16, bottom: 28 };
+  const pesos = datos.map((d) => d.weight);
+  let min = Math.min(...pesos), max = Math.max(...pesos);
+  if (min === max) { min -= 5; max += 5; }
+  const margen = (max - min) * 0.15;
+  min -= margen; max += margen;
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+  const x = (i) => pad.left + (datos.length === 1 ? plotW / 2 : (i / (datos.length - 1)) * plotW);
+  const y = (val) => pad.top + plotH - ((val - min) / (max - min)) * plotH;
+
+  // líneas de referencia horizontales
+  ctx.strokeStyle = border;
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 3; i++) {
+    const yy = pad.top + (plotH / 3) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, yy); ctx.lineTo(w - pad.right, yy); ctx.stroke();
+    const valor = max - ((max - min) / 3) * i;
+    ctx.fillStyle = muted;
+    ctx.font = "10px Barlow, sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(Math.round(valor) + "kg", pad.left - 6, yy + 3);
+  }
+
+  // línea de progreso
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  datos.forEach((d, i) => { const px = x(i), py = y(d.weight); if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); });
+  ctx.stroke();
+
+  // puntos + fechas (solo primero, último y algunos intermedios si caben)
+  ctx.font = "10px Barlow, sans-serif";
+  ctx.fillStyle = muted;
+  ctx.textAlign = "center";
+  const pasoEtiqueta = Math.max(1, Math.ceil(datos.length / 5));
+  datos.forEach((d, i) => {
+    const px = x(i), py = y(d.weight);
+    ctx.fillStyle = accent;
+    ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI * 2); ctx.fill();
+    if (i % pasoEtiqueta === 0 || i === datos.length - 1) {
+      ctx.fillStyle = muted;
+      ctx.fillText(d.date.slice(5), px, h - pad.bottom + 16);
+    }
+  });
+
+  // último valor destacado
+  const ultimo = datos[datos.length - 1];
+  ctx.fillStyle = text;
+  ctx.font = "bold 13px Oswald, sans-serif";
+  ctx.textAlign = "right";
+  ctx.fillText(`${ultimo.weight} kg`, w - pad.right, pad.top + 4);
+}
+
 function formatUltimaVez(slug, nSeries) {
   const datos = [];
   let maxDate = null;
+  let algunaEncontrada = false;
   for (let s = 0; s < nSeries; s++) {
-    const d = getPesoGuardado(`${slug}:s${s}`);
+    const d = ultimaEntrada(slug, s);
     datos.push(d ? d.weight : null);
-    if (d && (!maxDate || d.date > maxDate)) maxDate = d.date;
+    if (d) { algunaEncontrada = true; if (!maxDate || d.date > maxDate) maxDate = d.date; }
   }
-  if (datos.every((d) => d === null)) return "";
-  const pesosTxt = datos.map((d) => (d === null ? "–" : d)).join("/");
-  return ` · última vez: ${pesosTxt} kg (${maxDate})`;
+  if (algunaEncontrada) {
+    const pesosTxt = datos.map((d) => (d === null ? "–" : d)).join("/");
+    return ` · última vez: ${pesosTxt} kg (${maxDate})`;
+  }
+  const ref = buscarReferenciaGrupo(slug);
+  if (ref) {
+    return ` · ref. grupo: ${ref.weight} kg (${SLUG_A_NOMBRE[ref.slug] || ref.slug}, ${ref.date})`;
+  }
+  return "";
 }
 
-function filaEjercicioHTML(ej, index) {
+function opcionesEdicion(poolGrupo, nombreActual) {
+  const fuente = poolGrupo === "abs" ? ABDOMINALES : POOLS[poolGrupo];
+  return fuente.filter((e) => e.n !== nombreActual);
+}
+
+function filaEjercicioHTML(ej, posIndex, mostrarNumero, dayIndex, tipo, poolGrupo) {
   const slug = slugify(ej.nombre);
   const nSeries = ej.series;
-  const numLabel = index != null ? (index + 1) + ". " : "";
+  const numLabel = mostrarNumero ? (posIndex + 1) + ". " : "";
   const setsHtml = Array.from({ length: nSeries }).map((_, s) => {
-    const ant = getPesoGuardado(`${slug}:s${s}`);
+    const ant = ultimaEntrada(slug, s);
     return `
       <div class="set-box">
         <span class="set-lbl">S${s + 1}</span>
         <input type="number" inputmode="decimal" data-slug="${slug}" data-set="${s}" placeholder="${ant ? ant.weight : 'kg'}" />
       </div>`;
   }).join("");
+  const sugerencia = sugerenciaProgresion(slug, 0);
+  const opciones = opcionesEdicion(poolGrupo, ej.nombre);
+  const selectId = `edit-${dayIndex}-${tipo}-${posIndex}`;
   return `
     <div class="row" data-exslug="${slug}" data-exseries="${nSeries}">
       <div class="info">
-        <div>${numLabel}${ej.nombre}${ej.maquina ? '<span class="machine-tag">MÁQUINA</span>' : ''}</div>
+        <div>${numLabel}${ej.nombre}${ej.maquina ? '<span class="machine-tag">MÁQUINA</span>' : ''}<button class="edit-btn" data-toggle-edit="${selectId}">✎</button></div>
         <div class="sub" data-sub="${slug}">${ej.series}x${ej.reps}${formatUltimaVez(slug, nSeries)}</div>
+        ${sugerencia ? `<div class="suggestion">${sugerencia}</div>` : ''}
       </div>
       <div class="sets-row">${setsHtml}</div>
+      <div class="edit-select-row" id="${selectId}">
+        <select data-day-index="${dayIndex}" data-tipo="${tipo}" data-pos-index="${posIndex}">
+          <option value="">Elegir otro ejercicio...</option>
+          ${opciones.map((o) => `<option value="${o.n.replace(/"/g, '&quot;')}">${o.n}${o.m ? ' (máquina)' : ''}</option>`).join("")}
+        </select>
+      </div>
     </div>
   `;
 }
@@ -750,6 +1127,9 @@ function render() {
   if (!plan) return;
 
   loadCodeSectionEl.style.display = "none";
+  actualizarRachaBadge();
+  progressLinkBtnEl.style.display = hayDatosDeProgreso() ? "block" : "none";
+  undoBoxEl.style.display = ultimoSnapshot ? "flex" : "none";
 
   const pesoKg = pesoUsuarioActual || parseFloat(pesoUsuarioEl.value) || 75;
   if (calcularCalorias) {
@@ -766,7 +1146,7 @@ function render() {
     if (codigoDesactualizado) {
       codeBoxEl.classList.add("stale");
       codeBoxEl.querySelector(".code-value").textContent = "— — — — — —";
-      codeBoxEl.querySelector(".code-note").textContent = "Has variado un día, así que el código ya no coincide. Pulsa \"Generar de nuevo\" para conseguir un código actualizado.";
+      codeBoxEl.querySelector(".code-note").textContent = "Has cambiado algo, así que el código ya no coincide. Pulsa \"Generar de nuevo\" para conseguir un código actualizado.";
     } else {
       codeBoxEl.classList.remove("stale");
       codeBoxEl.querySelector(".code-value").textContent = String(codigoActual).padStart(6, "0");
@@ -774,7 +1154,16 @@ function render() {
     }
   }
 
-  planEl.innerHTML = plan.map(({ dia, sesion }, index) => `
+  const semanaId = calcularSemanaId(new Date());
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+
+  planEl.innerHTML = plan.map(({ dia, sesion }, index) => {
+    const hecho = estaHecho(semanaId, index);
+    const diaIndexReal = DIAS.findIndex((d) => d.id === dia.id);
+    const fechaDia = fechaParaIndiceSemana(diaIndexReal);
+    const esPasado = fechaDia < hoy;
+    const mostrarAviso = esPasado && !hecho;
+    return `
     <div class="day-card" data-day-index="${index}">
       <div class="day-head">
         <div>
@@ -787,45 +1176,94 @@ function render() {
             <div class="num">~${kcalSesion(sesion, pesoKg)}</div>
             <div class="lbl">kcal</div>
           </div>` : ''}
+          <button class="hecho-btn${hecho ? ' done' : ''}" data-hecho="${index}">${hecho ? '✓ Hecho' : 'Marcar hecho'}</button>
           <button class="regen-btn" data-regen="${index}">↻ Variar</button>
         </div>
       </div>
+      ${mostrarAviso ? `<div class="warning-badge">⚠ No marcaste este día como hecho</div>` : ''}
       <div class="row warmup">
         <span>🏃 ${sesion.calentamiento.nombre}</span>
         <span class="detalle">${sesion.calentamiento.detalle}</span>
       </div>
-      ${sesion.ejercicios.map((ej, i) => filaEjercicioHTML(ej, i)).join("")}
+      ${sesion.ejercicios.map((ej, i) => filaEjercicioHTML(ej, i, true, index, "principal", sesion.grupo)).join("")}
       <div class="abs-label">Abdominales</div>
-      ${sesion.abdominales.map((ej) => filaEjercicioHTML(ej, null)).join("")}
+      ${sesion.abdominales.map((ej, i) => filaEjercicioHTML(ej, i, false, index, "abs", "abs")).join("")}
     </div>
-  `).join("");
+  `;
+  }).join("");
 
-  // Listeners: guardar peso al salir del campo (uno por cada serie)
+  // Guardar peso al salir del campo (uno por cada serie)
   planEl.querySelectorAll("input[data-slug]").forEach((input) => {
     input.addEventListener("blur", () => {
       const val = parseFloat(input.value);
       if (!isNaN(val) && val > 0) {
-        const key = `${input.dataset.slug}:s${input.dataset.set}`;
-        guardarPesoLocal(key, val);
+        guardarEnHistorialSet(input.dataset.slug, parseInt(input.dataset.set, 10), val);
         input.classList.add("saved");
         setTimeout(() => input.classList.remove("saved"), 1200);
-        // actualizar el hint "sub" del ejercicio con los pesos de todas sus series
         const row = input.closest(".row");
         const sub = row.querySelector(`[data-sub="${input.dataset.slug}"]`);
         if (sub) {
           const nSeries = parseInt(row.dataset.exseries, 10);
-          const baseTxt = sub.textContent.split(" · última vez")[0];
+          const baseTxt = sub.textContent.split(" · última vez")[0].split(" · ref. grupo")[0];
           sub.textContent = baseTxt + formatUltimaVez(input.dataset.slug, nSeries);
         }
+        progressLinkBtnEl.style.display = "block";
       }
     });
   });
 
-  // Listeners: variar ejercicios de un día
+  // Variar ejercicios de un día completo
   planEl.querySelectorAll("[data-regen]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const idx = parseInt(btn.dataset.regen, 10);
+      guardarSnapshot();
       plan[idx].sesion = generarSesion(plan[idx].sesion.nombre, Math.random, PRIORIDAD_PESOS[prioridad]);
+      codigoDesactualizado = true;
+      render();
+    });
+  });
+
+  // Marcar/desmarcar entrenamiento como hecho
+  planEl.querySelectorAll("[data-hecho]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.dataset.hecho, 10);
+      if (estaHecho(semanaId, idx)) desmarcarHecho(semanaId, idx);
+      else marcarHecho(semanaId, idx);
+      render();
+    });
+  });
+
+  // Mostrar/ocultar el selector de "editar ejercicio"
+  planEl.querySelectorAll("[data-toggle-edit]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = document.getElementById(btn.dataset.toggleEdit);
+      if (target) target.classList.toggle("open");
+    });
+  });
+
+  // Aplicar el cambio manual de ejercicio elegido en el selector
+  planEl.querySelectorAll(".edit-select-row select").forEach((select) => {
+    select.addEventListener("change", () => {
+      const nuevoNombre = select.value;
+      if (!nuevoNombre) return;
+      const dayIndex = parseInt(select.dataset.dayIndex, 10);
+      const tipo = select.dataset.tipo;
+      const posIndex = parseInt(select.dataset.posIndex, 10);
+      const poolGrupo = tipo === "abs" ? "abs" : plan[dayIndex].sesion.grupo;
+      const fuente = poolGrupo === "abs" ? ABDOMINALES : POOLS[poolGrupo];
+      const elegido = fuente.find((e) => e.n === nuevoNombre);
+      if (!elegido) return;
+      guardarSnapshot();
+      if (tipo === "abs") {
+        const actual = plan[dayIndex].sesion.abdominales[posIndex];
+        plan[dayIndex].sesion.abdominales[posIndex] = {
+          nombre: elegido.n, maquina: elegido.m, series: 3,
+          reps: elegido.n.includes("Plancha") || elegido.n.includes("Hollow") ? "30-45 seg" : actual.reps,
+        };
+      } else {
+        const nuevasReps = repsFor(elegido.n, Math.random);
+        plan[dayIndex].sesion.ejercicios[posIndex] = { nombre: elegido.n, maquina: elegido.m, c: elegido.c, ...nuevasReps };
+      }
       codigoDesactualizado = true;
       render();
     });
