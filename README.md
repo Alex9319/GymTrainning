@@ -24,34 +24,10 @@ Aplicación web de una sola página (HTML + CSS + JS, sin dependencias externas 
 Un único archivo autocontenido:
 
 ```
-generador-entrenos.html
+index.html
 ```
 
 No requiere build, ni `npm install`, ni servidor: es HTML/CSS/JS puro.
-
-## 🚀 Cómo publicarlo con GitHub Pages
-
-1. Crea un repositorio nuevo en GitHub (puede ser público, GitHub Pages es gratuito).
-2. Sube `generador-entrenos.html` a la raíz del repositorio (o a una carpeta, por ejemplo `docs/`).
-3. Ve a **Settings → Pages**.
-4. En "Source", elige la rama (`main`) y la carpeta (`/ (root)` o `/docs`).
-5. Guarda. En un par de minutos tendrás una URL pública tipo:
-
-   ```
-   https://tu-usuario.github.io/tu-repositorio/generador-entrenos.html
-   ```
-
-## 📱 Convertirlo en APK (Android)
-
-Con la URL de GitHub Pages ya puedes generar una app instalable:
-
-1. Ve a [pwabuilder.com](https://www.pwabuilder.com).
-2. Pega la URL de tu página publicada.
-3. Pulsa "Start" y espera el análisis.
-4. En la pestaña **Android**, descarga el paquete (APK o AAB).
-5. Instala el APK en tu móvil (puede que tengas que permitir "instalar apps de origenes desconocidos" la primera vez).
-
-> Los datos guardados (pesos, historial, racha...) son propios de cada "origen" (web abierta en el navegador vs. app instalada). Una vez instalado el APK, los datos se mantendrán estables mientras no desinstales la app.
 
 ## ⚠️ Notas
 
