@@ -267,6 +267,7 @@
     <div class="code-lbl">Tu código para compartir</div>
     <div class="code-value oswald">000000</div>
     <div class="code-note"></div>
+    <button class="regen-btn" id="resetCodeBtn" style="display:none; margin-top:10px;">Descartar cambios y generar código limpio</button>
   </div>
 
   <div class="load-code" id="loadCodeSection">
@@ -284,6 +285,7 @@
   </div>
 
   <button class="progress-link-btn" id="progressLinkBtn" style="display:none;">📈 Ver progreso</button>
+  <button class="progress-link-btn" id="historyLinkBtn" style="display:none;">📖 Ver historial de entrenos</button>
 
   <div id="plan"></div>
 
@@ -305,7 +307,14 @@
   </div>
 </div>
 
+<div class="wrap" id="historyView" style="display:none;">
+  <button class="progress-back" id="historyBackBtn">← Volver</button>
+  <h2>Historial de entrenos hechos</h2>
+  <div id="historyList"></div>
+</div>
+
 <footer class="app-footer">
+
   <span id="copyrightYear"></span> Alejandro Arévalo Romero. Todos los derechos reservados.
 </footer>
 
@@ -341,64 +350,64 @@ const GRUPO_POR_SESION = {
 
 const POOLS = {
   empuje: [
-    { n: "Press de pecho en máquina", m: true, c: true },
-    { n: "Press de hombro en máquina", m: true, c: true },
-    { n: "Pec deck / aperturas en máquina", m: true, c: false },
-    { n: "Fondos asistidos en máquina", m: true, c: true },
-    { n: "Press inclinado en máquina", m: true, c: true },
-    { n: "Press convergente en máquina", m: true, c: true },
-    { n: "Extensión de tríceps en polea", m: true, c: false },
-    { n: "Elevaciones laterales en polea", m: true, c: false },
-    { n: "Press de tríceps en máquina", m: true, c: false },
-    { n: "Cruce de poleas (aperturas en polea)", m: true, c: false },
-    { n: "Press banca con barra", m: false, c: true },
-    { n: "Press banca inclinado con mancuernas", m: false, c: true },
-    { n: "Press militar de pie", m: false, c: true },
-    { n: "Press Arnold", m: false, c: true },
-    { n: "Fondos en paralelas", m: false, c: true },
-    { n: "Aperturas con mancuernas", m: false, c: false },
-    { n: "Press francés", m: false, c: false },
-    { n: "Elevaciones laterales con mancuernas", m: false, c: false },
-    { n: "Fondos en banco", m: false, c: true },
-    { n: "Patada de tríceps con mancuerna", m: false, c: false },
+    { n: "Press de pecho en máquina", m: true, c: true, sg: "pecho" },
+    { n: "Press de hombro en máquina", m: true, c: true, sg: "hombro" },
+    { n: "Pec deck / aperturas en máquina", m: true, c: false, sg: "pecho" },
+    { n: "Fondos asistidos en máquina", m: true, c: true, sg: "triceps" },
+    { n: "Press inclinado en máquina", m: true, c: true, sg: "pecho" },
+    { n: "Press convergente en máquina", m: true, c: true, sg: "pecho" },
+    { n: "Extensión de tríceps en polea", m: true, c: false, sg: "triceps" },
+    { n: "Elevaciones laterales en polea", m: true, c: false, sg: "hombro" },
+    { n: "Press de tríceps en máquina", m: true, c: false, sg: "triceps" },
+    { n: "Cruce de poleas (aperturas en polea)", m: true, c: false, sg: "pecho" },
+    { n: "Press banca con barra", m: false, c: true, sg: "pecho" },
+    { n: "Press banca inclinado con mancuernas", m: false, c: true, sg: "pecho" },
+    { n: "Press militar de pie", m: false, c: true, sg: "hombro" },
+    { n: "Press Arnold", m: false, c: true, sg: "hombro" },
+    { n: "Fondos en paralelas", m: false, c: true, sg: "triceps" },
+    { n: "Aperturas con mancuernas", m: false, c: false, sg: "pecho" },
+    { n: "Press francés", m: false, c: false, sg: "triceps" },
+    { n: "Elevaciones laterales con mancuernas", m: false, c: false, sg: "hombro" },
+    { n: "Fondos en banco", m: false, c: true, sg: "triceps" },
+    { n: "Patada de tríceps con mancuerna", m: false, c: false, sg: "triceps" },
   ],
   traccion: [
-    { n: "Jalón al pecho en polea", m: true, c: true },
-    { n: "Remo en polea baja (sentado)", m: true, c: true },
-    { n: "Remo horizontal en máquina", m: true, c: true },
-    { n: "Curl de bíceps en máquina", m: true, c: false },
-    { n: "Jalón tras nuca en polea", m: true, c: true },
-    { n: "Dominadas asistidas en máquina", m: true, c: true },
-    { n: "Face pull en polea", m: true, c: false },
-    { n: "Curl de bíceps en polea", m: true, c: false },
-    { n: "Pull-over en polea", m: true, c: false },
-    { n: "Remo en máquina unilateral", m: true, c: true },
-    { n: "Dominadas pronas", m: false, c: true },
-    { n: "Remo con barra", m: false, c: true },
-    { n: "Remo con mancuerna a una mano", m: false, c: true },
-    { n: "Curl de bíceps con barra", m: false, c: false },
-    { n: "Curl martillo", m: false, c: false },
-    { n: "Curl inclinado con mancuernas", m: false, c: false },
-    { n: "Peso muerto rumano", m: false, c: true },
+    { n: "Jalón al pecho en polea", m: true, c: true, sg: "espalda" },
+    { n: "Remo en polea baja (sentado)", m: true, c: true, sg: "espalda" },
+    { n: "Remo horizontal en máquina", m: true, c: true, sg: "espalda" },
+    { n: "Curl de bíceps en máquina", m: true, c: false, sg: "biceps" },
+    { n: "Jalón tras nuca en polea", m: true, c: true, sg: "espalda" },
+    { n: "Dominadas asistidas en máquina", m: true, c: true, sg: "espalda" },
+    { n: "Face pull en polea", m: true, c: false, sg: "espalda" },
+    { n: "Curl de bíceps en polea", m: true, c: false, sg: "biceps" },
+    { n: "Pull-over en polea", m: true, c: false, sg: "espalda" },
+    { n: "Remo en máquina unilateral", m: true, c: true, sg: "espalda" },
+    { n: "Dominadas pronas", m: false, c: true, sg: "espalda" },
+    { n: "Remo con barra", m: false, c: true, sg: "espalda" },
+    { n: "Remo con mancuerna a una mano", m: false, c: true, sg: "espalda" },
+    { n: "Curl de bíceps con barra", m: false, c: false, sg: "biceps" },
+    { n: "Curl martillo", m: false, c: false, sg: "biceps" },
+    { n: "Curl inclinado con mancuernas", m: false, c: false, sg: "biceps" },
+    { n: "Peso muerto rumano", m: false, c: true, sg: "espalda" },
   ],
   pierna: [
-    { n: "Prensa de piernas", m: true, c: true },
-    { n: "Extensión de cuádriceps en máquina", m: true, c: false },
-    { n: "Curl femoral en máquina", m: true, c: false },
-    { n: "Máquina de aductores", m: true, c: false },
-    { n: "Máquina de abductores", m: true, c: false },
-    { n: "Elevación de talones en máquina (gemelo)", m: true, c: false },
-    { n: "Hack squat en máquina", m: true, c: true },
-    { n: "Sentadilla en máquina Smith", m: true, c: true },
-    { n: "Máquina de glúteo (patada en máquina)", m: true, c: false },
-    { n: "Prensa horizontal", m: true, c: true },
-    { n: "Sentadilla con barra", m: false, c: true },
-    { n: "Zancadas con mancuernas", m: false, c: true },
-    { n: "Peso muerto convencional", m: false, c: true },
-    { n: "Hip thrust con barra", m: false, c: true },
-    { n: "Sentadilla búlgara", m: false, c: true },
-    { n: "Peso muerto rumano con mancuernas", m: false, c: true },
-    { n: "Zancada búlgara con barra", m: false, c: true },
+    { n: "Prensa de piernas", m: true, c: true, sg: "cuadriceps" },
+    { n: "Extensión de cuádriceps en máquina", m: true, c: false, sg: "cuadriceps" },
+    { n: "Curl femoral en máquina", m: true, c: false, sg: "isquios" },
+    { n: "Máquina de aductores", m: true, c: false, sg: "aductor" },
+    { n: "Máquina de abductores", m: true, c: false, sg: "abductor" },
+    { n: "Elevación de talones en máquina (gemelo)", m: true, c: false, sg: "gemelo" },
+    { n: "Hack squat en máquina", m: true, c: true, sg: "cuadriceps" },
+    { n: "Sentadilla en máquina Smith", m: true, c: true, sg: "cuadriceps" },
+    { n: "Máquina de glúteo (patada en máquina)", m: true, c: false, sg: "gluteo" },
+    { n: "Prensa horizontal", m: true, c: true, sg: "cuadriceps" },
+    { n: "Sentadilla con barra", m: false, c: true, sg: "cuadriceps" },
+    { n: "Zancadas con mancuernas", m: false, c: true, sg: "cuadriceps" },
+    { n: "Peso muerto convencional", m: false, c: true, sg: "isquios" },
+    { n: "Hip thrust con barra", m: false, c: true, sg: "gluteo" },
+    { n: "Sentadilla búlgara", m: false, c: true, sg: "cuadriceps" },
+    { n: "Peso muerto rumano con mancuernas", m: false, c: true, sg: "isquios" },
+    { n: "Zancada búlgara con barra", m: false, c: true, sg: "cuadriceps" },
   ],
   superior: [
     { n: "Press de pecho en máquina", m: true, c: true },
@@ -474,7 +483,11 @@ function registrarEjercicio(nombre, grupo) {
   SLUG_A_GRUPOS[slug].add(grupo);
 }
 function construirMapasEjercicios() {
-  Object.entries(POOLS).forEach(([grupo, arr]) => arr.forEach((e) => registrarEjercicio(e.n, grupo)));
+  // Usamos el subgrupo muscular concreto (pecho, hombro, tríceps, espalda, bíceps,
+  // cuádriceps, isquios, glúteo, aductor, abductor, gemelo) en vez del banco de sesión
+  // (empuje/tracción/pierna), para no sugerir el peso de un press banca como referencia
+  // de una extensión de tríceps solo por estar en la misma sesión de "empuje".
+  ["empuje", "traccion", "pierna"].forEach((grupo) => POOLS[grupo].forEach((e) => registrarEjercicio(e.n, e.sg)));
   ABDOMINALES.forEach((e) => registrarEjercicio(e.n, "abs"));
 }
 
@@ -717,6 +730,70 @@ function guardarTema(valor) {
   localStorage.setItem("tema", valor);
 }
 
+// ---- Plan activo (persistencia de la semana en curso, incluidos cambios manuales) ----
+// Se guarda cada vez que el plan cambia, así que si recargas la página o cierras la app,
+// al volver encuentras exactamente el mismo entrenamiento con tus ediciones intactas.
+function guardarPlanActivo() {
+  const semanaId = calcularSemanaId(new Date());
+  const datos = { seleccionados, prioridad, plan, codigoActual, codigoDesactualizado };
+  try { localStorage.setItem(`planActivo:${semanaId}`, JSON.stringify(datos)); } catch (e) {}
+}
+function cargarPlanActivo() {
+  const semanaId = calcularSemanaId(new Date());
+  try {
+    const raw = localStorage.getItem(`planActivo:${semanaId}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function mismaSeleccion(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  const sa = [...a].sort(), sb = [...b].sort();
+  return sa.every((v, i) => v === sb[i]);
+}
+
+// ---- Historial de entrenos hechos (guardado aparte, con snapshot completo de cada sesión) ----
+function snapshotSesion(sesion, pesoKg) {
+  const leerPesos = (ej) => {
+    const slug = slugify(ej.nombre);
+    const hoy = new Date().toISOString().slice(0, 10);
+    const pesos = [];
+    for (let s = 0; s < ej.series; s++) {
+      const arr = getHistorialSet(slug, s);
+      const entradaHoy = arr.find((e) => e.date === hoy);
+      pesos.push(entradaHoy ? entradaHoy.weight : null);
+    }
+    return pesos;
+  };
+  return {
+    nombreSesion: sesion.nombre,
+    kcal: calcularCalorias ? kcalSesion(sesion, pesoKg) : null,
+    ejercicios: sesion.ejercicios.map((ej) => ({ nombre: ej.nombre, series: ej.series, reps: ej.reps, pesos: leerPesos(ej) })),
+    abdominales: sesion.abdominales.map((ej) => ({ nombre: ej.nombre, series: ej.series, reps: ej.reps, pesos: leerPesos(ej) })),
+  };
+}
+function guardarEntrenoEnHistorial(semanaId, dayIndex, diaFull, sesion, pesoKg) {
+  const fecha = new Date().toISOString().slice(0, 10);
+  const clave = `historialEntrenos:${semanaId}:${dayIndex}`;
+  const registro = { fecha, dia: diaFull, semanaId, ...snapshotSesion(sesion, pesoKg) };
+  try { localStorage.setItem(clave, JSON.stringify(registro)); } catch (e) {}
+}
+function borrarEntrenoDelHistorial(semanaId, dayIndex) {
+  localStorage.removeItem(`historialEntrenos:${semanaId}:${dayIndex}`);
+}
+function listaHistorialEntrenos() {
+  const registros = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith("historialEntrenos:")) {
+      try {
+        const r = JSON.parse(localStorage.getItem(k));
+        if (r) registros.push(r);
+      } catch (e) {}
+    }
+  }
+  return registros.sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
+}
+
 construirMapasEjercicios();
 
 // ---- Estado ----
@@ -737,6 +814,7 @@ const totalWeekEl = document.getElementById("totalWeek");
 const totalWeekValEl = document.getElementById("totalWeekVal");
 const footnoteEl = document.getElementById("footnote");
 const codeBoxEl = document.getElementById("codeBox");
+const resetCodeBtnEl = document.getElementById("resetCodeBtn");
 const codeInputEl = document.getElementById("codeInput");
 const loadCodeBtn = document.getElementById("loadCodeBtn");
 const codeErrorEl = document.getElementById("codeError");
@@ -755,6 +833,10 @@ const progressBackBtnEl = document.getElementById("progressBackBtn");
 const progressSelectEl = document.getElementById("progressSelect");
 const progressCanvasEl = document.getElementById("progressCanvas");
 const temaBtnEl = document.getElementById("temaBtn");
+const historyLinkBtnEl = document.getElementById("historyLinkBtn");
+const historyViewEl = document.getElementById("historyView");
+const historyBackBtnEl = document.getElementById("historyBackBtn");
+const historyListEl = document.getElementById("historyList");
 
 // ---- Tema ----
 function aplicarTema(tema) {
@@ -855,6 +937,22 @@ function actualizarChipsUI() {
   genBtn.disabled = seleccionados.length === 0;
 }
 
+// Descarta las ediciones locales (✎ / "Variar") y vuelve al plan base de la semana,
+// recuperando así un código de 6 dígitos que sí se puede compartir.
+function regenerarPlanLimpio() {
+  const orden = DIAS.filter((d) => seleccionados.includes(d.id));
+  const codigo = generarCodigo(seleccionados, prioridad);
+  const rng = crearRng(codigo);
+  const splits = SPLITS[Math.min(orden.length, 7)];
+  const pesos = PRIORIDAD_PESOS[prioridad];
+  plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos) }));
+  codigoActual = codigo;
+  codigoDesactualizado = false;
+  ultimoSnapshot = null;
+  render();
+}
+resetCodeBtnEl.addEventListener("click", regenerarPlanLimpio);
+
 genBtn.onclick = () => {
   if (seleccionados.length === 0) return;
   if (calcularCalorias) {
@@ -866,14 +964,23 @@ genBtn.onclick = () => {
     }
     guardarYMostrarPeso(pesoVal);
   }
-  const orden = DIAS.filter((d) => seleccionados.includes(d.id));
-  const codigo = generarCodigo(seleccionados, prioridad);
-  const rng = crearRng(codigo);
-  const splits = SPLITS[Math.min(orden.length, 7)];
-  const pesos = PRIORIDAD_PESOS[prioridad];
-  plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos) }));
-  codigoActual = codigo;
-  codigoDesactualizado = false;
+  // Si ya existe un plan activo para esta semana con los mismos días y prioridad,
+  // lo recuperamos tal cual (con tus ediciones manuales) en vez de regenerarlo desde cero.
+  const activo = cargarPlanActivo();
+  if (activo && mismaSeleccion(activo.seleccionados, seleccionados) && activo.prioridad === prioridad && activo.plan) {
+    plan = activo.plan;
+    codigoActual = activo.codigoActual;
+    codigoDesactualizado = activo.codigoDesactualizado;
+  } else {
+    const orden = DIAS.filter((d) => seleccionados.includes(d.id));
+    const codigo = generarCodigo(seleccionados, prioridad);
+    const rng = crearRng(codigo);
+    const splits = SPLITS[Math.min(orden.length, 7)];
+    const pesos = PRIORIDAD_PESOS[prioridad];
+    plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos) }));
+    codigoActual = codigo;
+    codigoDesactualizado = false;
+  }
   ultimoSnapshot = null;
   genBtn.textContent = "Generar de nuevo";
   render();
@@ -976,6 +1083,55 @@ function cerrarProgreso() {
 progressLinkBtnEl.addEventListener("click", abrirProgreso);
 progressBackBtnEl.addEventListener("click", cerrarProgreso);
 progressSelectEl.addEventListener("change", dibujarGraficaSiVisible);
+
+function filaHistorialEjercicioHTML(ej) {
+  const pesosTxt = ej.pesos.map((p) => (p === null || p === undefined ? "–" : p)).join("/");
+  return `
+    <div class="row">
+      <div class="info">
+        <div>${ej.nombre}</div>
+        <div class="sub">${ej.series}x${ej.reps} · pesos: ${pesosTxt} kg</div>
+      </div>
+    </div>`;
+}
+function renderizarHistorial() {
+  const registros = listaHistorialEntrenos();
+  if (registros.length === 0) {
+    historyListEl.innerHTML = `<div class="progress-empty">Todavía no has marcado ningún entreno como hecho.</div>`;
+    return;
+  }
+  historyListEl.innerHTML = registros.map((r) => `
+    <div class="day-card">
+      <div class="day-head">
+        <div>
+          <div class="dia-full">${r.fecha} · ${r.dia}</div>
+          <div class="sesion-nombre">${r.nombreSesion}</div>
+        </div>
+        ${r.kcal != null ? `
+        <div class="kcal-box">
+          <div class="num">~${r.kcal}</div>
+          <div class="lbl">kcal</div>
+        </div>` : ''}
+      </div>
+      ${r.ejercicios.map(filaHistorialEjercicioHTML).join("")}
+      <div class="abs-label">Abdominales</div>
+      ${r.abdominales.map(filaHistorialEjercicioHTML).join("")}
+    </div>
+  `).join("");
+}
+function abrirHistorial() {
+  renderizarHistorial();
+  mainViewEl.style.display = "none";
+  historyViewEl.style.display = "block";
+  window.scrollTo(0, 0);
+}
+function cerrarHistorial() {
+  historyViewEl.style.display = "none";
+  mainViewEl.style.display = "block";
+  window.scrollTo(0, 0);
+}
+historyLinkBtnEl.addEventListener("click", abrirHistorial);
+historyBackBtnEl.addEventListener("click", cerrarHistorial);
 
 // ---- Dibujar la gráfica de progreso en canvas ----
 function colorVar(nombre) {
@@ -1126,9 +1282,11 @@ function filaEjercicioHTML(ej, posIndex, mostrarNumero, dayIndex, tipo, poolGrup
 function render() {
   if (!plan) return;
 
+  guardarPlanActivo();
   loadCodeSectionEl.style.display = "none";
   actualizarRachaBadge();
   progressLinkBtnEl.style.display = hayDatosDeProgreso() ? "block" : "none";
+  historyLinkBtnEl.style.display = listaHistorialEntrenos().length > 0 ? "block" : "none";
   undoBoxEl.style.display = ultimoSnapshot ? "flex" : "none";
 
   const pesoKg = pesoUsuarioActual || parseFloat(pesoUsuarioEl.value) || 75;
@@ -1146,11 +1304,13 @@ function render() {
     if (codigoDesactualizado) {
       codeBoxEl.classList.add("stale");
       codeBoxEl.querySelector(".code-value").textContent = "— — — — — —";
-      codeBoxEl.querySelector(".code-note").textContent = "Has cambiado algo, así que el código ya no coincide. Pulsa \"Generar de nuevo\" para conseguir un código actualizado.";
+      codeBoxEl.querySelector(".code-note").textContent = "Has cambiado algo, así que el código ya no coincide con lo que ves. Tu compañero/a no se ve afectado por tus cambios (cada uno guarda su plan por separado), pero si quieres volver a tener un código compartible, descarta los cambios.";
+      resetCodeBtnEl.style.display = "block";
     } else {
       codeBoxEl.classList.remove("stale");
       codeBoxEl.querySelector(".code-value").textContent = String(codigoActual).padStart(6, "0");
       codeBoxEl.querySelector(".code-note").textContent = "Compártelo con tu compañero/a de entreno para que le salga exactamente lo mismo.";
+      resetCodeBtnEl.style.display = "none";
     }
   }
 
@@ -1223,12 +1383,17 @@ function render() {
     });
   });
 
-  // Marcar/desmarcar entrenamiento como hecho
+  // Marcar/desmarcar entrenamiento como hecho (guarda un snapshot completo en el historial)
   planEl.querySelectorAll("[data-hecho]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const idx = parseInt(btn.dataset.hecho, 10);
-      if (estaHecho(semanaId, idx)) desmarcarHecho(semanaId, idx);
-      else marcarHecho(semanaId, idx);
+      if (estaHecho(semanaId, idx)) {
+        desmarcarHecho(semanaId, idx);
+        borrarEntrenoDelHistorial(semanaId, idx);
+      } else {
+        marcarHecho(semanaId, idx);
+        guardarEntrenoEnHistorial(semanaId, idx, plan[idx].dia.full, plan[idx].sesion, pesoKg);
+      }
       render();
     });
   });
@@ -1269,6 +1434,21 @@ function render() {
     });
   });
 }
+
+// ---- Recuperar el plan activo de esta semana al abrir la app (si existe) ----
+(function inicializarPlanActivo() {
+  const activo = cargarPlanActivo();
+  if (activo && activo.plan && activo.seleccionados && activo.seleccionados.length > 0) {
+    seleccionados = activo.seleccionados;
+    prioridad = activo.prioridad || "maquina";
+    plan = activo.plan;
+    codigoActual = activo.codigoActual;
+    codigoDesactualizado = !!activo.codigoDesactualizado;
+    actualizarChipsUI();
+    genBtn.textContent = "Generar de nuevo";
+    render();
+  }
+})();
 </script>
 </body>
 </html>
