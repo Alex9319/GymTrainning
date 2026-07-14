@@ -478,11 +478,21 @@ function calcularBitmask(seleccion) {
 function decodificarBitmask(mask) {
   return DIAS.filter((d, i) => mask & (1 << i)).map((d) => d.id);
 }
+// Calcula un identificador de semana ISO (año*100 + nº de semana), para que la parte
+// "aleatoria" del código dependa de la semana en curso y no cambie hasta la semana siguiente.
+function calcularSemanaId(fecha) {
+  const d = new Date(Date.UTC(fecha.getFullYear(), fecha.getMonth(), fecha.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const inicioAno = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const semana = Math.ceil((((d - inicioAno) / 86400000) + 1) / 7);
+  return d.getUTCFullYear() * 100 + semana;
+}
+
 function generarCodigo(seleccion, prioridad) {
   const bitmask = calcularBitmask(seleccion); // 1-127
   const pIdx = PRIORIDAD_ORDEN.indexOf(prioridad); // 0-2
   const meta = (bitmask - 1) * 3 + pIdx; // 0-380
-  const seedPart = Math.floor(Math.random() * 2600); // 0-2599
+  const seedPart = calcularSemanaId(new Date()) % 2600; // misma semana = mismo valor
   return meta * 2600 + seedPart; // máx 990599, cabe en 6 dígitos
 }
 function construirPlanDesdeCodigo(codigo) {
