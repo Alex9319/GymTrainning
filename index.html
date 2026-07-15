@@ -786,11 +786,14 @@ function snapshotSesion(sesion, pesoKg) {
     }
     return pesos;
   };
+  // Solo se guardan en el historial los ejercicios en los que se anotó al menos un peso ese día;
+  // si no anotaste nada, no tiene sentido dejar constancia de que "hiciste" ese ejercicio.
+  const conAlgunPeso = (ej) => ej.pesos.some((p) => p !== null);
   return {
     nombreSesion: sesion.nombre,
     kcal: calcularCalorias ? kcalSesion(sesion, pesoKg) : null,
-    ejercicios: sesion.ejercicios.map((ej) => ({ nombre: ej.nombre, series: ej.series, reps: ej.reps, pesos: leerPesos(ej) })),
-    abdominales: sesion.abdominales.map((ej) => ({ nombre: ej.nombre, series: ej.series, reps: ej.reps, pesos: leerPesos(ej) })),
+    ejercicios: sesion.ejercicios.map((ej) => ({ nombre: ej.nombre, series: ej.series, reps: ej.reps, pesos: leerPesos(ej) })).filter(conAlgunPeso),
+    abdominales: sesion.abdominales.map((ej) => ({ nombre: ej.nombre, series: ej.series, reps: ej.reps, pesos: leerPesos(ej) })).filter(conAlgunPeso),
   };
 }
 function guardarEntrenoEnHistorial(semanaId, dayIndex, diaFull, sesion, pesoKg) {
@@ -1145,7 +1148,11 @@ function renderizarHistorial() {
     historyListEl.innerHTML = `<div class="progress-empty">Todavía no has marcado ningún entreno como hecho.</div>`;
     return;
   }
-  historyListEl.innerHTML = registros.map((r) => `
+  historyListEl.innerHTML = registros.map((r) => {
+    const conPeso = (ej) => ej.pesos.some((p) => p !== null && p !== undefined);
+    const ejercicios = r.ejercicios.filter(conPeso);
+    const abdominales = r.abdominales.filter(conPeso);
+    return `
     <div class="day-card">
       <div class="day-head">
         <div>
@@ -1158,11 +1165,11 @@ function renderizarHistorial() {
           <div class="lbl">kcal</div>
         </div>` : ''}
       </div>
-      ${r.ejercicios.map(filaHistorialEjercicioHTML).join("")}
-      <div class="abs-label">Abdominales</div>
-      ${r.abdominales.map(filaHistorialEjercicioHTML).join("")}
+      ${ejercicios.map(filaHistorialEjercicioHTML).join("")}
+      ${abdominales.length > 0 ? `<div class="abs-label">Abdominales</div>${abdominales.map(filaHistorialEjercicioHTML).join("")}` : ''}
     </div>
-  `).join("");
+  `;
+  }).join("");
 }
 function abrirHistorial() {
   renderizarHistorial();
