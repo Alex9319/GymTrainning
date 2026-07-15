@@ -95,6 +95,18 @@
     display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--accent);
     border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; font-size: 13px; color: var(--text);
   }
+  .config-resumen {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 20px;
+  }
+  .config-resumen-code { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 16px; color: var(--accent); letter-spacing: 0.08em; }
+  .config-resumen-detalle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .config-resumen button {
+    background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px;
+    padding: 8px 12px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif; white-space: nowrap;
+  }
+  .config-resumen button:hover { border-color: var(--accent); color: var(--accent); }
   .undo-box {
     display: flex; justify-content: space-between; align-items: center; background: var(--card);
     border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
@@ -227,36 +239,46 @@
 
   <div class="racha-badge" id="rachaBadge" style="display:none;"></div>
 
-  <label class="check-row">
-    <span class="switch">
-      <input type="checkbox" id="calcularCalCheck" checked />
-      <span class="switch-track"></span>
-    </span>
-    <span class="switch-label">Calcular calorías estimadas</span>
-  </label>
-
-  <div id="pesoSection">
-    <div class="section-label">Tu peso corporal (para calcular las kcal)</div>
-    <div class="peso-view" id="pesoView" style="display:none;">
-      <span id="pesoViewText"></span>
-      <a href="#" id="pesoModificarLink">Modificar</a>
+  <div class="config-resumen" id="configResumen" style="display:none;">
+    <div class="config-resumen-info">
+      <div class="config-resumen-code" id="configResumenCode"></div>
+      <div class="config-resumen-detalle" id="configResumenDetalle"></div>
     </div>
-    <div class="peso-edit" id="pesoEdit">
-      <div class="peso-row">
-        <input type="number" id="pesoUsuario" placeholder="kg" min="30" max="200" />
-        <span>kg</span>
-      </div>
-    </div>
-    <div class="peso-error" id="pesoError" style="display:none;">Introduce tu peso antes de generar el entrenamiento.</div>
+    <button id="expandirConfigBtn">✎ Cambiar</button>
   </div>
 
-  <div class="section-label">¿Qué días entrenas?</div>
-  <div class="days" id="days"></div>
+  <div id="configOptions">
+    <label class="check-row">
+      <span class="switch">
+        <input type="checkbox" id="calcularCalCheck" checked />
+        <span class="switch-track"></span>
+      </span>
+      <span class="switch-label">Calcular calorías estimadas</span>
+    </label>
 
-  <div class="section-label">¿Qué prefieres priorizar?</div>
-  <div class="days" id="prioridad"></div>
+    <div id="pesoSection">
+      <div class="section-label">Tu peso corporal (para calcular las kcal)</div>
+      <div class="peso-view" id="pesoView" style="display:none;">
+        <span id="pesoViewText"></span>
+        <a href="#" id="pesoModificarLink">Modificar</a>
+      </div>
+      <div class="peso-edit" id="pesoEdit">
+        <div class="peso-row">
+          <input type="number" id="pesoUsuario" placeholder="kg" min="30" max="200" />
+          <span>kg</span>
+        </div>
+      </div>
+      <div class="peso-error" id="pesoError" style="display:none;">Introduce tu peso antes de generar el entrenamiento.</div>
+    </div>
 
-  <button class="gen-btn oswald" id="genBtn" disabled>Generar entrenamientos</button>
+    <div class="section-label">¿Qué días entrenas?</div>
+    <div class="days" id="days"></div>
+
+    <div class="section-label">¿Qué prefieres priorizar?</div>
+    <div class="days" id="prioridad"></div>
+
+    <button class="gen-btn oswald" id="genBtn" disabled>Generar entrenamientos</button>
+  </div>
 
   <div class="undo-box" id="undoBox" style="display:none;">
     <span>Has cambiado un ejercicio.</span>
@@ -890,6 +912,27 @@ pesoUsuarioEl.addEventListener("change", () => {
 
 const calcularCalCheckEl = document.getElementById("calcularCalCheck");
 const pesoSectionEl = document.getElementById("pesoSection");
+const configOptionsEl = document.getElementById("configOptions");
+const configResumenEl = document.getElementById("configResumen");
+const configResumenCodeEl = document.getElementById("configResumenCode");
+const configResumenDetalleEl = document.getElementById("configResumenDetalle");
+const expandirConfigBtnEl = document.getElementById("expandirConfigBtn");
+
+function colapsarConfig() {
+  configOptionsEl.style.display = "none";
+  configResumenEl.style.display = "flex";
+  const nombresDias = DIAS.filter((d) => seleccionados.includes(d.id)).map((d) => d.label).join(", ");
+  configResumenCodeEl.textContent = codigoDesactualizado
+    ? "Código no disponible (has hecho cambios)"
+    : `Código: ${String(codigoActual).padStart(6, "0")}`;
+  configResumenDetalleEl.textContent = `${nombresDias} · ${PRIORIDAD_LABELS[prioridad]}`;
+}
+function expandirConfig() {
+  configOptionsEl.style.display = "block";
+  configResumenEl.style.display = "none";
+}
+expandirConfigBtnEl.addEventListener("click", expandirConfig);
+
 let calcularCalorias = calcularCalCheckEl.checked;
 calcularCalCheckEl.addEventListener("change", () => {
   calcularCalorias = calcularCalCheckEl.checked;
@@ -983,6 +1026,7 @@ genBtn.onclick = () => {
   }
   ultimoSnapshot = null;
   genBtn.textContent = "Generar de nuevo";
+  colapsarConfig();
   render();
 };
 
@@ -1017,6 +1061,7 @@ loadCodeBtn.onclick = () => {
   codigoDesactualizado = false;
   ultimoSnapshot = null;
   genBtn.textContent = "Generar de nuevo";
+  colapsarConfig();
   render();
 };
 
@@ -1288,6 +1333,7 @@ function render() {
   progressLinkBtnEl.style.display = hayDatosDeProgreso() ? "block" : "none";
   historyLinkBtnEl.style.display = listaHistorialEntrenos().length > 0 ? "block" : "none";
   undoBoxEl.style.display = ultimoSnapshot ? "flex" : "none";
+  if (configResumenEl.style.display !== "none") colapsarConfig();
 
   const pesoKg = pesoUsuarioActual || parseFloat(pesoUsuarioEl.value) || 75;
   if (calcularCalorias) {
@@ -1446,6 +1492,7 @@ function render() {
     codigoDesactualizado = !!activo.codigoDesactualizado;
     actualizarChipsUI();
     genBtn.textContent = "Generar de nuevo";
+    colapsarConfig();
     render();
   }
 })();
