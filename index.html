@@ -513,8 +513,13 @@ function construirMapasEjercicios() {
   ABDOMINALES.forEach((e) => registrarEjercicio(e.n, "abs"));
 }
 
-function pickPriorizandoMaquinas(pool, n, rng, pesos) {
-  const copy = pool.map((e) => ({ ...e }));
+function pickPriorizandoMaquinas(pool, n, rng, pesos, excluir) {
+  excluir = excluir || new Set();
+  let candidatos = pool.filter((e) => !excluir.has(e.n));
+  // Si no quedan suficientes ejercicios "nuevos" para completar la sesión
+  // (p. ej. semanas con muchos días), se permite repetir antes que dejar la sesión coja.
+  if (candidatos.length < n) candidatos = pool;
+  const copy = candidatos.map((e) => ({ ...e }));
   const out = [];
   for (let i = 0; i < n && copy.length > 0; i++) {
     const weights = copy.map((e) => (e.m ? pesos.m : pesos.l));
@@ -568,12 +573,15 @@ function kcalSesion(sesion, pesoKg) {
   return Math.round((calentamiento + principal + abs) / 10) * 10;
 }
 
-function generarSesion(nombreSesion, rng, pesos) {
+function generarSesion(nombreSesion, rng, pesos, usadosSemana) {
+  usadosSemana = usadosSemana || new Set();
   const grupo = GRUPO_POR_SESION[nombreSesion] || "full";
   const pool = POOLS[grupo];
   const nEjercicios = grupo === "full" ? 6 : 7;
-  const elegidos = pickPriorizandoMaquinas(pool, nEjercicios, rng, pesos);
-  const abs = pickPriorizandoMaquinas(ABDOMINALES, 3, rng, pesos);
+  const elegidos = pickPriorizandoMaquinas(pool, nEjercicios, rng, pesos, usadosSemana);
+  const abs = pickPriorizandoMaquinas(ABDOMINALES, 3, rng, pesos, usadosSemana);
+  elegidos.forEach((e) => usadosSemana.add(e.n));
+  abs.forEach((e) => usadosSemana.add(e.n));
   return {
     nombre: nombreSesion,
     grupo: grupo,
@@ -620,8 +628,9 @@ function construirPlanDesdeCodigo(codigo) {
   const splits = SPLITS[Math.min(orden.length, 7)];
   const rng = crearRng(codigo);
   const pesos = PRIORIDAD_PESOS[prioridad];
+  const usadosSemana = new Set();
   return {
-    plan: orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos) })),
+    plan: orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos, usadosSemana) })),
     diasIds,
     prioridad,
   };
@@ -991,7 +1000,8 @@ function regenerarPlanLimpio() {
   const rng = crearRng(codigo);
   const splits = SPLITS[Math.min(orden.length, 7)];
   const pesos = PRIORIDAD_PESOS[prioridad];
-  plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos) }));
+  const usadosSemana = new Set();
+  plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos, usadosSemana) }));
   codigoActual = codigo;
   codigoDesactualizado = false;
   ultimoSnapshot = null;
@@ -1023,7 +1033,8 @@ genBtn.onclick = () => {
     const rng = crearRng(codigo);
     const splits = SPLITS[Math.min(orden.length, 7)];
     const pesos = PRIORIDAD_PESOS[prioridad];
-    plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos) }));
+    const usadosSemana = new Set();
+    plan = orden.map((dia, i) => ({ dia, sesion: generarSesion(splits[i % splits.length], rng, pesos, usadosSemana) }));
     codigoActual = codigo;
     codigoDesactualizado = false;
   }
@@ -1430,7 +1441,13 @@ function render() {
     btn.addEventListener("click", () => {
       const idx = parseInt(btn.dataset.regen, 10);
       guardarSnapshot();
-      plan[idx].sesion = generarSesion(plan[idx].sesion.nombre, Math.random, PRIORIDAD_PESOS[prioridad]);
+      const usadosOtrosDias = new Set();
+      plan.forEach((p, i) => {
+        if (i === idx) return;
+        p.sesion.ejercicios.forEach((e) => usadosOtrosDias.add(e.nombre));
+        p.sesion.abdominales.forEach((e) => usadosOtrosDias.add(e.nombre));
+      });
+      plan[idx].sesion = generarSesion(plan[idx].sesion.nombre, Math.random, PRIORIDAD_PESOS[prioridad], usadosOtrosDias);
       codigoDesactualizado = true;
       render();
     });
