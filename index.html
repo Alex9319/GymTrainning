@@ -1409,7 +1409,7 @@ function render() {
   planEl.querySelectorAll("input[data-slug]").forEach((input) => {
     input.addEventListener("blur", () => {
       const val = parseFloat(input.value);
-      if (!isNaN(val) && val > 0) {
+      if (!isNaN(val) && val >= 0) {
         guardarEnHistorialSet(input.dataset.slug, parseInt(input.dataset.set, 10), val);
         input.classList.add("saved");
         setTimeout(() => input.classList.remove("saved"), 1200);
