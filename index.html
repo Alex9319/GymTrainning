@@ -644,20 +644,46 @@ function getHistorialSet(slug, n) {
     return raw ? JSON.parse(raw) : [];
   } catch (e) { return []; }
 }
-function guardarEnHistorialSet(slug, n, weight) {
+function guardarEnHistorialSet(slug, n, weight, fecha) {
   const arr = getHistorialSet(slug, n);
-  const hoy = new Date().toISOString().slice(0, 10);
-  const idx = arr.findIndex((e) => e.date === hoy);
+  const dia = fecha || new Date().toISOString().slice(0, 10);
+  const idx = arr.findIndex((e) => e.date === dia);
   if (idx >= 0) arr[idx].weight = weight;
-  else arr.push({ date: hoy, weight });
+  else arr.push({ date: dia, weight });
   arr.sort((a, b) => (a.date > b.date ? 1 : -1));
   const recortado = arr.slice(-12);
   localStorage.setItem(`serie:${slug}:s${n}`, JSON.stringify(recortado));
   return recortado;
 }
+function entradaEnFecha(slug, n, fecha) {
+  const arr = getHistorialSet(slug, n);
+  return arr.find((e) => e.date === fecha) || null;
+}
 function ultimaEntrada(slug, n) {
   const arr = getHistorialSet(slug, n);
   return arr.length ? arr[arr.length - 1] : null;
+}
+
+// ---- Pesos de la semana activa, aislados por código ----
+// No se mezclan entre semanas/códigos distintos, aunque coincida el ejercicio.
+// Clave: "semana:<codigo>" -> { "<slug>:s<N>": weight, ... }
+function getPesosSemana(codigo) {
+  if (codigo == null) return {};
+  try {
+    const raw = localStorage.getItem(`semana:${codigo}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+function pesoSemana(codigo, slug, n) {
+  const datos = getPesosSemana(codigo);
+  const v = datos[`${slug}:s${n}`];
+  return v === undefined ? null : v;
+}
+function guardarPesoSemana(codigo, slug, n, weight) {
+  if (codigo == null) return;
+  const datos = getPesosSemana(codigo);
+  datos[`${slug}:s${n}`] = weight;
+  localStorage.setItem(`semana:${codigo}`, JSON.stringify(datos));
 }
 
 // Referencia de otro ejercicio del mismo grupo muscular cuando el actual no tiene historial propio.
@@ -752,6 +778,14 @@ function fechaParaIndiceSemana(diaIndex) {
   fecha.setDate(lunes.getDate() + diaIndex);
   return fecha;
 }
+// Formatea una fecha en YYYY-MM-DD usando componentes locales (evita el desfase
+// de un día que da toISOString() al convertir a UTC).
+function formatFechaLocal(fecha) {
+  const y = fecha.getFullYear();
+  const m = String(fecha.getMonth() + 1).padStart(2, "0");
+  const d = String(fecha.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
 
 // ---- Tema claro/oscuro ----
 function getTemaGuardado() {
@@ -783,15 +817,14 @@ function mismaSeleccion(a, b) {
 }
 
 // ---- Historial de entrenos hechos (guardado aparte, con snapshot completo de cada sesión) ----
-function snapshotSesion(sesion, pesoKg) {
+function snapshotSesion(sesion, pesoKg, fecha) {
   const leerPesos = (ej) => {
     const slug = slugify(ej.nombre);
-    const hoy = new Date().toISOString().slice(0, 10);
     const pesos = [];
     for (let s = 0; s < ej.series; s++) {
       const arr = getHistorialSet(slug, s);
-      const entradaHoy = arr.find((e) => e.date === hoy);
-      pesos.push(entradaHoy ? entradaHoy.weight : null);
+      const entradaDia = arr.find((e) => e.date === fecha);
+      pesos.push(entradaDia ? entradaDia.weight : null);
     }
     return pesos;
   };
@@ -805,10 +838,9 @@ function snapshotSesion(sesion, pesoKg) {
     abdominales: sesion.abdominales.map((ej) => ({ nombre: ej.nombre, series: ej.series, reps: ej.reps, pesos: leerPesos(ej) })).filter(conAlgunPeso),
   };
 }
-function guardarEntrenoEnHistorial(semanaId, dayIndex, diaFull, sesion, pesoKg) {
-  const fecha = new Date().toISOString().slice(0, 10);
+function guardarEntrenoEnHistorial(semanaId, dayIndex, diaFull, sesion, pesoKg, fecha) {
   const clave = `historialEntrenos:${semanaId}:${dayIndex}`;
-  const registro = { fecha, dia: diaFull, semanaId, ...snapshotSesion(sesion, pesoKg) };
+  const registro = { fecha, dia: diaFull, semanaId, ...snapshotSesion(sesion, pesoKg, fecha) };
   try { localStorage.setItem(clave, JSON.stringify(registro)); } catch (e) {}
 }
 function borrarEntrenoDelHistorial(semanaId, dayIndex) {
@@ -1309,16 +1341,20 @@ function opcionesEdicion(poolGrupo, nombreActual) {
   return fuente.filter((e) => e.n !== nombreActual);
 }
 
-function filaEjercicioHTML(ej, posIndex, mostrarNumero, dayIndex, tipo, poolGrupo) {
+function filaEjercicioHTML(ej, posIndex, mostrarNumero, dayIndex, tipo, poolGrupo, fechaDia) {
   const slug = slugify(ej.nombre);
   const nSeries = ej.series;
   const numLabel = mostrarNumero ? (posIndex + 1) + ". " : "";
   const setsHtml = Array.from({ length: nSeries }).map((_, s) => {
     const ant = ultimaEntrada(slug, s);
+    const pesoDelCodigo = pesoSemana(codigoActual, slug, s);
+    const deEstaSemana = pesoDelCodigo !== null ? pesoDelCodigo : (entradaEnFecha(slug, s, fechaDia) || {}).weight;
     return `
       <div class="set-box">
         <span class="set-lbl">S${s + 1}</span>
-        <input type="number" inputmode="decimal" data-slug="${slug}" data-set="${s}" placeholder="${ant ? ant.weight : 'kg'}" />
+        <input type="number" inputmode="decimal" data-slug="${slug}" data-set="${s}" data-fecha="${fechaDia}"
+          value="${deEstaSemana !== undefined && deEstaSemana !== null ? deEstaSemana : ''}"
+          placeholder="${ant ? ant.weight : 'kg'}" />
       </div>`;
   }).join("");
   const sugerencia = sugerenciaProgresion(slug, 0);
@@ -1421,7 +1457,8 @@ function render() {
     input.addEventListener("blur", () => {
       const val = parseFloat(input.value);
       if (!isNaN(val) && val >= 0) {
-        guardarEnHistorialSet(input.dataset.slug, parseInt(input.dataset.set, 10), val);
+        guardarEnHistorialSet(input.dataset.slug, parseInt(input.dataset.set, 10), val, input.dataset.fecha);
+        guardarPesoSemana(codigoActual, input.dataset.slug, parseInt(input.dataset.set, 10), val);
         input.classList.add("saved");
         setTimeout(() => input.classList.remove("saved"), 1200);
         const row = input.closest(".row");
@@ -1462,7 +1499,8 @@ function render() {
         borrarEntrenoDelHistorial(semanaId, idx);
       } else {
         marcarHecho(semanaId, idx);
-        guardarEntrenoEnHistorial(semanaId, idx, plan[idx].dia.full, plan[idx].sesion, pesoKg);
+        const diaIndexReal = DIAS.findIndex((d) => d.id === plan[idx].dia.id);
+        guardarEntrenoEnHistorial(semanaId, idx, plan[idx].dia.full, plan[idx].sesion, pesoKg, fechaParaIndiceSemana(diaIndexReal));
       }
       render();
     });
