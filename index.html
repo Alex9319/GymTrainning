@@ -663,6 +663,19 @@ function ultimaEntrada(slug, n) {
   const arr = getHistorialSet(slug, n);
   return arr.length ? arr[arr.length - 1] : null;
 }
+// Última entrada anterior a esta semana: para que "última vez" sea siempre una
+// referencia de una semana pasada y no lo que acabas de escribir ahora mismo.
+function inicioSemanaActualStr() {
+  return formatFechaLocal(fechaParaIndiceSemana(0));
+}
+function ultimaEntradaAntesDeEstaSemana(slug, n) {
+  const arr = getHistorialSet(slug, n);
+  const limite = inicioSemanaActualStr();
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (arr[i].date < limite) return arr[i];
+  }
+  return null;
+}
 
 // ---- Pesos de la semana activa, aislados por código ----
 // No se mezclan entre semanas/códigos distintos, aunque coincida el ejercicio.
@@ -1321,7 +1334,7 @@ function formatUltimaVez(slug, nSeries) {
   let maxDate = null;
   let algunaEncontrada = false;
   for (let s = 0; s < nSeries; s++) {
-    const d = ultimaEntrada(slug, s);
+    const d = ultimaEntradaAntesDeEstaSemana(slug, s);
     datos.push(d ? d.weight : null);
     if (d) { algunaEncontrada = true; if (!maxDate || d.date > maxDate) maxDate = d.date; }
   }
@@ -1346,7 +1359,7 @@ function filaEjercicioHTML(ej, posIndex, mostrarNumero, dayIndex, tipo, poolGrup
   const nSeries = ej.series;
   const numLabel = mostrarNumero ? (posIndex + 1) + ". " : "";
   const setsHtml = Array.from({ length: nSeries }).map((_, s) => {
-    const ant = ultimaEntrada(slug, s);
+    const ant = ultimaEntradaAntesDeEstaSemana(slug, s);
     const pesoDelCodigo = pesoSemana(codigoActual, slug, s);
     const deEstaSemana = pesoDelCodigo !== null ? pesoDelCodigo : (entradaEnFecha(slug, s, fechaDia) || {}).weight;
     return `
