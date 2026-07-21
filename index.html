@@ -372,98 +372,98 @@ const GRUPO_POR_SESION = {
 
 const POOLS = {
   empuje: [
-    { n: "Press de pecho en máquina", m: true, c: true, sg: "pecho" },
-    { n: "Press de hombro en máquina", m: true, c: true, sg: "hombro" },
-    { n: "Pec deck / aperturas en máquina", m: true, c: false, sg: "pecho" },
-    { n: "Fondos asistidos en máquina", m: true, c: true, sg: "triceps" },
-    { n: "Press inclinado en máquina", m: true, c: true, sg: "pecho" },
+    { n: "Press de pecho en máquina", m: true, c: true, sg: "pecho", fam: "press_pecho_plano" },
+    { n: "Press de hombro en máquina", m: true, c: true, sg: "hombro", fam: "press_hombro" },
+    { n: "Pec deck / aperturas en máquina", m: true, c: false, sg: "pecho", fam: "aperturas_pecho" },
+    { n: "Fondos asistidos en máquina", m: true, c: true, sg: "triceps", fam: "fondos" },
+    { n: "Press inclinado en máquina", m: true, c: true, sg: "pecho", fam: "press_pecho_inclinado" },
     { n: "Press convergente en máquina", m: true, c: true, sg: "pecho" },
     { n: "Extensión de tríceps en polea", m: true, c: false, sg: "triceps" },
-    { n: "Elevaciones laterales en polea", m: true, c: false, sg: "hombro" },
+    { n: "Elevaciones laterales en polea", m: true, c: false, sg: "hombro", fam: "elevacion_lateral" },
     { n: "Press de tríceps en máquina", m: true, c: false, sg: "triceps" },
-    { n: "Cruce de poleas (aperturas en polea)", m: true, c: false, sg: "pecho" },
-    { n: "Press banca con barra", m: false, c: true, sg: "pecho" },
-    { n: "Press banca inclinado con mancuernas", m: false, c: true, sg: "pecho" },
-    { n: "Press militar de pie", m: false, c: true, sg: "hombro" },
+    { n: "Cruce de poleas (aperturas en polea)", m: true, c: false, sg: "pecho", fam: "aperturas_pecho" },
+    { n: "Press banca con barra", m: false, c: true, sg: "pecho", fam: "press_pecho_plano" },
+    { n: "Press banca inclinado con mancuernas", m: false, c: true, sg: "pecho", fam: "press_pecho_inclinado" },
+    { n: "Press militar de pie", m: false, c: true, sg: "hombro", fam: "press_hombro" },
     { n: "Press Arnold", m: false, c: true, sg: "hombro" },
-    { n: "Fondos en paralelas", m: false, c: true, sg: "triceps" },
-    { n: "Aperturas con mancuernas", m: false, c: false, sg: "pecho" },
+    { n: "Fondos en paralelas", m: false, c: true, sg: "triceps", fam: "fondos" },
+    { n: "Aperturas con mancuernas", m: false, c: false, sg: "pecho", fam: "aperturas_pecho" },
     { n: "Press francés", m: false, c: false, sg: "triceps" },
-    { n: "Elevaciones laterales con mancuernas", m: false, c: false, sg: "hombro" },
-    { n: "Fondos en banco", m: false, c: true, sg: "triceps" },
+    { n: "Elevaciones laterales con mancuernas", m: false, c: false, sg: "hombro", fam: "elevacion_lateral" },
+    { n: "Fondos en banco", m: false, c: true, sg: "triceps", fam: "fondos" },
     { n: "Patada de tríceps con mancuerna", m: false, c: false, sg: "triceps" },
   ],
   traccion: [
     { n: "Jalón al pecho en polea", m: true, c: true, sg: "espalda" },
-    { n: "Remo en polea baja (sentado)", m: true, c: true, sg: "espalda" },
-    { n: "Remo horizontal en máquina", m: true, c: true, sg: "espalda" },
-    { n: "Curl de bíceps en máquina", m: true, c: false, sg: "biceps" },
+    { n: "Remo en polea baja (sentado)", m: true, c: true, sg: "espalda", fam: "remo_horizontal" },
+    { n: "Remo horizontal en máquina", m: true, c: true, sg: "espalda", fam: "remo_horizontal" },
+    { n: "Curl de bíceps en máquina", m: true, c: false, sg: "biceps", fam: "curl_biceps" },
     { n: "Jalón tras nuca en polea", m: true, c: true, sg: "espalda" },
-    { n: "Dominadas asistidas en máquina", m: true, c: true, sg: "espalda" },
+    { n: "Dominadas asistidas en máquina", m: true, c: true, sg: "espalda", fam: "dominadas" },
     { n: "Face pull en polea", m: true, c: false, sg: "espalda" },
-    { n: "Curl de bíceps en polea", m: true, c: false, sg: "biceps" },
+    { n: "Curl de bíceps en polea", m: true, c: false, sg: "biceps", fam: "curl_biceps" },
     { n: "Pull-over en polea", m: true, c: false, sg: "espalda" },
-    { n: "Remo en máquina unilateral", m: true, c: true, sg: "espalda" },
-    { n: "Dominadas pronas", m: false, c: true, sg: "espalda" },
-    { n: "Remo con barra", m: false, c: true, sg: "espalda" },
-    { n: "Remo con mancuerna a una mano", m: false, c: true, sg: "espalda" },
-    { n: "Curl de bíceps con barra", m: false, c: false, sg: "biceps" },
+    { n: "Remo en máquina unilateral", m: true, c: true, sg: "espalda", fam: "remo_unilateral" },
+    { n: "Dominadas pronas", m: false, c: true, sg: "espalda", fam: "dominadas" },
+    { n: "Remo con barra", m: false, c: true, sg: "espalda", fam: "remo_horizontal" },
+    { n: "Remo con mancuerna a una mano", m: false, c: true, sg: "espalda", fam: "remo_unilateral" },
+    { n: "Curl de bíceps con barra", m: false, c: false, sg: "biceps", fam: "curl_biceps" },
     { n: "Curl martillo", m: false, c: false, sg: "biceps" },
     { n: "Curl inclinado con mancuernas", m: false, c: false, sg: "biceps" },
     { n: "Peso muerto rumano", m: false, c: true, sg: "espalda" },
   ],
   pierna: [
-    { n: "Prensa de piernas", m: true, c: true, sg: "cuadriceps" },
+    { n: "Prensa de piernas", m: true, c: true, sg: "cuadriceps", fam: "prensa_piernas" },
     { n: "Extensión de cuádriceps en máquina", m: true, c: false, sg: "cuadriceps" },
     { n: "Curl femoral en máquina", m: true, c: false, sg: "isquios" },
     { n: "Máquina de aductores", m: true, c: false, sg: "aductor" },
     { n: "Máquina de abductores", m: true, c: false, sg: "abductor" },
     { n: "Elevación de talones en máquina (gemelo)", m: true, c: false, sg: "gemelo" },
-    { n: "Hack squat en máquina", m: true, c: true, sg: "cuadriceps" },
-    { n: "Sentadilla en máquina Smith", m: true, c: true, sg: "cuadriceps" },
+    { n: "Hack squat en máquina", m: true, c: true, sg: "cuadriceps", fam: "sentadilla" },
+    { n: "Sentadilla en máquina Smith", m: true, c: true, sg: "cuadriceps", fam: "sentadilla" },
     { n: "Máquina de glúteo (patada en máquina)", m: true, c: false, sg: "gluteo" },
-    { n: "Prensa horizontal", m: true, c: true, sg: "cuadriceps" },
-    { n: "Sentadilla con barra", m: false, c: true, sg: "cuadriceps" },
+    { n: "Prensa horizontal", m: true, c: true, sg: "cuadriceps", fam: "prensa_piernas" },
+    { n: "Sentadilla con barra", m: false, c: true, sg: "cuadriceps", fam: "sentadilla" },
     { n: "Zancadas con mancuernas", m: false, c: true, sg: "cuadriceps" },
     { n: "Peso muerto convencional", m: false, c: true, sg: "isquios" },
     { n: "Hip thrust con barra", m: false, c: true, sg: "gluteo" },
-    { n: "Sentadilla búlgara", m: false, c: true, sg: "cuadriceps" },
+    { n: "Sentadilla búlgara", m: false, c: true, sg: "cuadriceps", fam: "bulgara" },
     { n: "Peso muerto rumano con mancuernas", m: false, c: true, sg: "isquios" },
-    { n: "Zancada búlgara con barra", m: false, c: true, sg: "cuadriceps" },
+    { n: "Zancada búlgara con barra", m: false, c: true, sg: "cuadriceps", fam: "bulgara" },
   ],
   superior: [
-    { n: "Press de pecho en máquina", m: true, c: true },
-    { n: "Press de hombro en máquina", m: true, c: true },
+    { n: "Press de pecho en máquina", m: true, c: true, fam: "press_pecho_plano" },
+    { n: "Press de hombro en máquina", m: true, c: true, fam: "press_hombro" },
     { n: "Jalón al pecho en polea", m: true, c: true },
-    { n: "Remo en polea baja (sentado)", m: true, c: true },
-    { n: "Fondos asistidos en máquina", m: true, c: true },
-    { n: "Dominadas asistidas en máquina", m: true, c: true },
-    { n: "Curl de bíceps en máquina", m: true, c: false },
+    { n: "Remo en polea baja (sentado)", m: true, c: true, fam: "remo_horizontal" },
+    { n: "Fondos asistidos en máquina", m: true, c: true, fam: "fondos" },
+    { n: "Dominadas asistidas en máquina", m: true, c: true, fam: "dominadas" },
+    { n: "Curl de bíceps en máquina", m: true, c: false, fam: "curl_biceps" },
     { n: "Extensión de tríceps en polea", m: true, c: false },
-    { n: "Elevaciones laterales en polea", m: true, c: false },
+    { n: "Elevaciones laterales en polea", m: true, c: false, fam: "elevacion_lateral" },
     { n: "Face pull en polea", m: true, c: false },
-    { n: "Press banca con barra", m: false, c: true },
-    { n: "Dominadas pronas", m: false, c: true },
-    { n: "Press militar de pie", m: false, c: true },
-    { n: "Remo con barra", m: false, c: true },
-    { n: "Fondos en paralelas", m: false, c: true },
-    { n: "Curl de bíceps con barra", m: false, c: false },
+    { n: "Press banca con barra", m: false, c: true, fam: "press_pecho_plano" },
+    { n: "Dominadas pronas", m: false, c: true, fam: "dominadas" },
+    { n: "Press militar de pie", m: false, c: true, fam: "press_hombro" },
+    { n: "Remo con barra", m: false, c: true, fam: "remo_horizontal" },
+    { n: "Fondos en paralelas", m: false, c: true, fam: "fondos" },
+    { n: "Curl de bíceps con barra", m: false, c: false, fam: "curl_biceps" },
   ],
   full: [
-    { n: "Prensa de piernas", m: true, c: true },
-    { n: "Press de pecho en máquina", m: true, c: true },
-    { n: "Remo horizontal en máquina", m: true, c: true },
+    { n: "Prensa de piernas", m: true, c: true, fam: "prensa_piernas" },
+    { n: "Press de pecho en máquina", m: true, c: true, fam: "press_pecho_plano" },
+    { n: "Remo horizontal en máquina", m: true, c: true, fam: "remo_horizontal" },
     { n: "Extensión de cuádriceps en máquina", m: true, c: false },
     { n: "Jalón al pecho en polea", m: true, c: true },
-    { n: "Press de hombro en máquina", m: true, c: true },
+    { n: "Press de hombro en máquina", m: true, c: true, fam: "press_hombro" },
     { n: "Curl femoral en máquina", m: true, c: false },
-    { n: "Curl de bíceps en máquina", m: true, c: false },
-    { n: "Sentadilla con barra", m: false, c: true },
-    { n: "Press banca con barra", m: false, c: true },
-    { n: "Remo con barra", m: false, c: true },
+    { n: "Curl de bíceps en máquina", m: true, c: false, fam: "curl_biceps" },
+    { n: "Sentadilla con barra", m: false, c: true, fam: "sentadilla" },
+    { n: "Press banca con barra", m: false, c: true, fam: "press_pecho_plano" },
+    { n: "Remo con barra", m: false, c: true, fam: "remo_horizontal" },
     { n: "Peso muerto rumano", m: false, c: true },
-    { n: "Press militar de pie", m: false, c: true },
-    { n: "Dominadas pronas", m: false, c: true },
+    { n: "Press militar de pie", m: false, c: true, fam: "press_hombro" },
+    { n: "Dominadas pronas", m: false, c: true, fam: "dominadas" },
     { n: "Zancadas con mancuernas", m: false, c: true },
   ],
 };
@@ -485,6 +485,9 @@ const ABDOMINALES = [
   { n: "Crunch inverso", m: false },
   { n: "Hollow hold", m: false },
 ];
+
+const NOMBRE_A_FAM = {};
+Object.values(POOLS).forEach((pool) => pool.forEach((e) => { if (e.fam) NOMBRE_A_FAM[e.n] = e.fam; }));
 
 const PRIORIDAD_PESOS = {
   maquina: { m: 3, l: 1 },
@@ -515,9 +518,12 @@ function construirMapasEjercicios() {
 
 function pickPriorizandoMaquinas(pool, n, rng, pesos, excluir) {
   excluir = excluir || new Set();
-  let candidatos = pool.filter((e) => !excluir.has(e.n));
-  // Si no quedan suficientes ejercicios "nuevos" para completar la sesión
-  // (p. ej. semanas con muchos días), se permite repetir antes que dejar la sesión coja.
+  const excluido = (e) => excluir.has(e.n) || (e.fam && excluir.has(`fam:${e.fam}`));
+  let candidatos = pool.filter((e) => !excluido(e));
+  // Si no quedan suficientes ejercicios "nuevos" para completar la sesión, se relaja
+  // primero la restricción de familia (permite repetir el movimiento) y, como último
+  // recurso, se permite repetir el ejercicio exacto antes que dejar la sesión coja.
+  if (candidatos.length < n) candidatos = pool.filter((e) => !excluir.has(e.n));
   if (candidatos.length < n) candidatos = pool;
   const copy = candidatos.map((e) => ({ ...e }));
   const out = [];
@@ -530,7 +536,16 @@ function pickPriorizandoMaquinas(pool, n, rng, pesos, excluir) {
       r -= weights[idx];
       if (r <= 0) break;
     }
-    out.push(copy.splice(Math.min(idx, copy.length - 1), 1)[0]);
+    const elegido = copy.splice(Math.min(idx, copy.length - 1), 1)[0];
+    out.push(elegido);
+    // Dentro de la misma sesión, si el elegido tiene familia, se quitan del resto de
+    // candidatos otras variantes del mismo movimiento (p. ej. no coincidir "fondos en
+    // máquina" y "fondos en paralelas" en el mismo día).
+    if (elegido.fam) {
+      for (let j = copy.length - 1; j >= 0; j--) {
+        if (copy[j].fam === elegido.fam) copy.splice(j, 1);
+      }
+    }
   }
   return out;
 }
@@ -580,8 +595,8 @@ function generarSesion(nombreSesion, rng, pesos, usadosSemana) {
   const nEjercicios = grupo === "full" ? 6 : 7;
   const elegidos = pickPriorizandoMaquinas(pool, nEjercicios, rng, pesos, usadosSemana);
   const abs = pickPriorizandoMaquinas(ABDOMINALES, 3, rng, pesos, usadosSemana);
-  elegidos.forEach((e) => usadosSemana.add(e.n));
-  abs.forEach((e) => usadosSemana.add(e.n));
+  elegidos.forEach((e) => { usadosSemana.add(e.n); if (e.fam) usadosSemana.add(`fam:${e.fam}`); });
+  abs.forEach((e) => { usadosSemana.add(e.n); if (e.fam) usadosSemana.add(`fam:${e.fam}`); });
   return {
     nombre: nombreSesion,
     grupo: grupo,
@@ -1495,8 +1510,8 @@ function render() {
       const usadosOtrosDias = new Set();
       plan.forEach((p, i) => {
         if (i === idx) return;
-        p.sesion.ejercicios.forEach((e) => usadosOtrosDias.add(e.nombre));
-        p.sesion.abdominales.forEach((e) => usadosOtrosDias.add(e.nombre));
+        p.sesion.ejercicios.forEach((e) => { usadosOtrosDias.add(e.nombre); if (NOMBRE_A_FAM[e.nombre]) usadosOtrosDias.add(`fam:${NOMBRE_A_FAM[e.nombre]}`); });
+        p.sesion.abdominales.forEach((e) => { usadosOtrosDias.add(e.nombre); if (NOMBRE_A_FAM[e.nombre]) usadosOtrosDias.add(`fam:${NOMBRE_A_FAM[e.nombre]}`); });
       });
       plan[idx].sesion = generarSesion(plan[idx].sesion.nombre, Math.random, PRIORIDAD_PESOS[prioridad], usadosOtrosDias);
       codigoDesactualizado = true;
