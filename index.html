@@ -1434,6 +1434,7 @@ function render() {
     const hecho = estaHecho(semanaId, index);
     const diaIndexReal = DIAS.findIndex((d) => d.id === dia.id);
     const fechaDia = fechaParaIndiceSemana(diaIndexReal);
+    const fechaDiaStr = formatFechaLocal(fechaDia);
     const esPasado = fechaDia < hoy;
     const mostrarAviso = esPasado && !hecho;
     return `
@@ -1458,9 +1459,9 @@ function render() {
         <span>🏃 ${sesion.calentamiento.nombre}</span>
         <span class="detalle">${sesion.calentamiento.detalle}</span>
       </div>
-      ${sesion.ejercicios.map((ej, i) => filaEjercicioHTML(ej, i, true, index, "principal", sesion.grupo)).join("")}
+      ${sesion.ejercicios.map((ej, i) => filaEjercicioHTML(ej, i, true, index, "principal", sesion.grupo, fechaDiaStr)).join("")}
       <div class="abs-label">Abdominales</div>
-      ${sesion.abdominales.map((ej, i) => filaEjercicioHTML(ej, i, false, index, "abs", "abs")).join("")}
+      ${sesion.abdominales.map((ej, i) => filaEjercicioHTML(ej, i, false, index, "abs", "abs", fechaDiaStr)).join("")}
     </div>
   `;
   }).join("");
@@ -1513,7 +1514,7 @@ function render() {
       } else {
         marcarHecho(semanaId, idx);
         const diaIndexReal = DIAS.findIndex((d) => d.id === plan[idx].dia.id);
-        guardarEntrenoEnHistorial(semanaId, idx, plan[idx].dia.full, plan[idx].sesion, pesoKg, fechaParaIndiceSemana(diaIndexReal));
+        guardarEntrenoEnHistorial(semanaId, idx, plan[idx].dia.full, plan[idx].sesion, pesoKg, formatFechaLocal(fechaParaIndiceSemana(diaIndexReal)));
       }
       render();
     });
