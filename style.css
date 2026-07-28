@@ -1,125 +1,219 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<title>Generador de Entrenos</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<button class="tema-btn" id="temaBtn" aria-label="Cambiar tema">🌙</button>
-
-<div class="wrap" id="mainView">
-  <div class="badge">Cinta 10' → Fuerza → Abdominales</div>
-  <h1 class="oswald">GENERADOR<br/>DE ENTRENOS</h1>
-  <p class="subtitle">Elige los días que entrenas. Anota el peso que uses en cada ejercicio y la próxima vez que te toque verás con qué kilos empezaste la última vez.</p>
-
-  <div class="racha-badge" id="rachaBadge" style="display:none;"></div>
-
-  <div class="config-resumen" id="configResumen" style="display:none;">
-    <div class="config-resumen-info">
-      <div class="config-resumen-code" id="configResumenCode"></div>
-      <div class="config-resumen-detalle" id="configResumenDetalle"></div>
-    </div>
-    <button id="expandirConfigBtn">✎ Cambiar</button>
-  </div>
-
-  <div id="configOptions">
-    <label class="check-row">
-      <span class="switch">
-        <input type="checkbox" id="calcularCalCheck" checked />
-        <span class="switch-track"></span>
-      </span>
-      <span class="switch-label">Calcular calorías estimadas</span>
-    </label>
-
-    <div id="pesoSection">
-      <div class="section-label">Tu peso corporal (para calcular las kcal)</div>
-      <div class="peso-view" id="pesoView" style="display:none;">
-        <span id="pesoViewText"></span>
-        <a href="#" id="pesoModificarLink">Modificar</a>
-      </div>
-      <div class="peso-edit" id="pesoEdit">
-        <div class="peso-row">
-          <input type="number" id="pesoUsuario" placeholder="kg" min="30" max="200" />
-          <span>kg</span>
-        </div>
-      </div>
-      <div class="peso-error" id="pesoError" style="display:none;">Introduce tu peso antes de generar el entrenamiento.</div>
-    </div>
-
-    <div class="section-label">¿Qué días entrenas?</div>
-    <div class="days" id="days"></div>
-
-    <div class="section-label">¿Qué prefieres priorizar?</div>
-    <div class="days" id="prioridad"></div>
-
-    <button class="gen-btn oswald" id="genBtn" disabled>Generar entrenamientos</button>
-  </div>
-
-  <div class="undo-box" id="undoBox" style="display:none;">
-    <span>Has cambiado un ejercicio.</span>
-    <button id="undoBtn">↩ Deshacer</button>
-  </div>
-
-  <div class="code-box" id="codeBox" style="display:none;">
-    <div class="code-lbl">Tu código para compartir</div>
-    <div class="code-value oswald">000000</div>
-    <div class="code-note"></div>
-    <button class="regen-btn" id="resetCodeBtn" style="display:none; margin-top:10px;">Descartar cambios y generar código limpio</button>
-  </div>
-
-  <div class="load-code" id="loadCodeSection">
-    <div class="section-label">¿Tienes un código de tu compañero/a?</div>
-    <div class="load-code-row">
-      <input type="text" inputmode="numeric" maxlength="6" placeholder="123456" id="codeInput" />
-      <button id="loadCodeBtn">Cargar entrenamiento</button>
-    </div>
-    <div class="code-error" id="codeError" style="display:none;"></div>
-  </div>
-
-  <div class="total-week" id="totalWeek" style="display:none;">
-    <span>Total estimado de la semana</span>
-    <span class="val" id="totalWeekVal">~0 kcal</span>
-  </div>
-
-  <button class="progress-link-btn" id="progressLinkBtn" style="display:none;">📈 Ver progreso</button>
-  <button class="progress-link-btn" id="historyLinkBtn" style="display:none;">📖 Ver historial de entrenos</button>
-
-  <div id="plan"></div>
-
-  <p class="footnote" id="footnote" style="display:none;">
-    Puedes anotar el peso de cada serie por separado (S1, S2, S3...). Se guardan en este dispositivo
-    (en este navegador) al salir de cada casilla. Cuando el ejercicio se repita en una futura sesión,
-    verás "última vez" con el peso de cada serie y la fecha, para saber por dónde empezar.
-    Las calorías se calculan con tu peso corporal y una estimación de esfuerzo (MET) por tipo de
-    ejercicio y descanso entre series — es una aproximación razonable, no una medición exacta.
-  </p>
-</div>
-
-<div class="wrap" id="progressView" style="display:none;">
-  <button class="progress-back" id="progressBackBtn">← Volver</button>
-  <h2>Tu progreso</h2>
-  <select class="progress-select" id="progressSelect"></select>
-  <div class="progress-chart-card">
-    <canvas id="progressCanvas" width="600" height="240" style="width:100%; height:auto; display:block;"></canvas>
-  </div>
-</div>
-
-<div class="wrap" id="historyView" style="display:none;">
-  <button class="progress-back" id="historyBackBtn">← Volver</button>
-  <h2>Historial de entrenos hechos</h2>
-  <div id="historyList"></div>
-</div>
-
-<footer class="app-footer">
-
-  <span id="copyrightYear"></span> Alejandro Arévalo Romero. Todos los derechos reservados.
-</footer>
-
-<script src="script.js"></script>
-</body>
-</html>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#1C1B1A; --card:#262422; --card2:#2A2826; --border:#3D3A36; --rowborder:#322F2C;
+    --text:#EDEAE3; --muted:#9A948A; --muted2:#7d786f; --accent:#E8B93A; --onaccent:#1C1B1A;
+    --danger:#E0725A; --success:#8FBF5C; --inputbg:#1C1B1A;
+  }
+  html.light-theme {
+    --bg:#F3EEE3; --card:#FFFFFF; --card2:#F1EBDD; --border:#DDD5C2; --rowborder:#EAE3D3;
+    --text:#2B2620; --muted:#6C6455; --muted2:#89806E; --accent:#E8B93A; --onaccent:#1C1B1A;
+    --danger:#C24E36; --success:#3F7A34; --inputbg:#FFFFFF;
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Barlow', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .oswald { font-family: 'Oswald', sans-serif; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 60px; }
+  .badge {
+    display: inline-block; background: var(--accent); color: var(--onaccent);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    padding: 4px 10px; margin-bottom: 12px; text-transform: uppercase;
+  }
+  h1 { font-size: 36px; font-weight: 700; line-height: 1.05; }
+  h2 { font-size: 24px; font-weight: 700; font-family: 'Oswald', sans-serif; margin-bottom: 16px; }
+  .subtitle { color: var(--muted); margin-top: 10px; font-size: 15px; line-height: 1.5; }
+  .section-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted);
+    margin-bottom: 10px; text-transform: uppercase; font-family: 'Oswald', sans-serif;
+  }
+  .tema-btn {
+    position: fixed; top: 14px; right: 14px; z-index: 50; background: var(--card);
+    border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px;
+    border-radius: 50%; font-size: 16px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .check-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; cursor: pointer; }
+  .switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .switch-track {
+    position: absolute; inset: 0; background-color: var(--border); border-radius: 999px;
+    transition: background-color 0.2s ease; cursor: pointer;
+  }
+  .switch-track::before {
+    content: ""; position: absolute; height: 20px; width: 20px; left: 3px; top: 3px;
+    background-color: var(--text); border-radius: 50%; transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+  .switch input:checked + .switch-track { background-color: var(--accent); }
+  .switch input:checked + .switch-track::before { transform: translateX(18px); background-color: var(--onaccent); }
+  .switch-label { font-size: 14px; color: var(--text); }
+  .days { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .peso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+  .peso-row input {
+    width: 80px; background: var(--card); border: 2px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 10px 12px; font-size: 15px; font-family: 'Barlow', sans-serif; text-align: center;
+  }
+  .peso-row span { color: var(--muted); font-size: 14px; }
+  .peso-view {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;
+  }
+  .peso-view span { color: var(--text); font-size: 14px; }
+  .peso-view a { color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; }
+  .peso-view a:hover { text-decoration: underline; }
+  .peso-error { color: var(--danger); font-size: 12px; margin: -12px 0 20px; }
+  .app-footer {
+    text-align: center; color: var(--muted2); font-size: 11px; padding: 24px 20px 32px;
+    border-top: 1px solid var(--card2); margin-top: 8px;
+  }
+  .day-chip {
+    cursor: pointer; border: 2px solid var(--border); background: var(--card); color: var(--text);
+    border-radius: 8px; padding: 10px 16px; font-weight: 600; font-size: 14px;
+    font-family: 'Barlow', sans-serif; transition: all 0.15s ease;
+  }
+  .day-chip:hover { transform: translateY(-2px); }
+  .day-chip.active { border-color: var(--accent); background: var(--accent); color: var(--onaccent); }
+  .gen-btn {
+    width: 100%; padding: 16px; background: var(--accent); color: var(--onaccent); border: none;
+    border-radius: 8px; font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; cursor: pointer; margin-bottom: 20px; font-family: 'Oswald', sans-serif;
+  }
+  .gen-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .gen-btn:active:not(:disabled) { transform: scale(0.98); }
+  .racha-badge {
+    display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; font-size: 13px; color: var(--text);
+  }
+  .config-resumen {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 20px;
+  }
+  .config-resumen-code { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 16px; color: var(--accent); letter-spacing: 0.08em; }
+  .config-resumen-detalle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .config-resumen button {
+    background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px;
+    padding: 8px 12px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif; white-space: nowrap;
+  }
+  .config-resumen button:hover { border-color: var(--accent); color: var(--accent); }
+  .undo-box {
+    display: flex; justify-content: space-between; align-items: center; background: var(--card);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
+    font-size: 13px; color: var(--muted);
+  }
+  .undo-box button {
+    background: transparent; border: 1px solid var(--border); color: var(--accent);
+    border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif;
+  }
+  .progress-link-btn {
+    display: block; width: 100%; text-align: center; background: var(--card); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600;
+    cursor: pointer; margin-bottom: 20px; font-family: 'Barlow', sans-serif;
+  }
+  .progress-link-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .total-week {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+    padding: 10px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; font-size: 13px;
+  }
+  .total-week span.val { color: var(--accent); font-weight: 700; font-size: 16px; font-family: 'Oswald', sans-serif; }
+  .day-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .day-head {
+    display: flex; justify-content: space-between; align-items: center; padding: 14px 18px;
+    border-bottom: 1px solid var(--border); background: var(--card2); gap: 10px; flex-wrap: wrap;
+  }
+  .day-head .dia-full { font-size: 12px; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
+  .day-head .sesion-nombre { font-size: 19px; font-weight: 600; font-family: 'Oswald', sans-serif; }
+  .kcal-box { text-align: right; }
+  .kcal-box .num { font-size: 15px; font-weight: 700; font-family: 'Oswald', sans-serif; }
+  .kcal-box .lbl { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.05em; }
+  .regen-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif; white-space: nowrap;
+  }
+  .regen-btn:hover { background: var(--border); }
+  .hecho-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif; white-space: nowrap;
+  }
+  .hecho-btn.done { background: var(--success); border-color: var(--success); color: var(--onaccent); font-weight: 700; }
+  .warning-badge { font-size: 11px; color: var(--danger); padding: 6px 18px 0; }
+  .row {
+    display: flex; flex-direction: column; padding: 10px 18px;
+    font-size: 14px; border-bottom: 1px solid var(--rowborder); gap: 6px;
+  }
+  .row.warmup { flex-direction: row; justify-content: space-between; align-items: center; }
+  .row:hover { background: rgba(232, 185, 58, 0.07); }
+  .row.warmup { color: var(--muted); }
+  .row.warmup .detalle { font-style: italic; }
+  .row .info { min-width: 0; }
+  .row .sub { color: var(--muted2); font-size: 12px; margin-top: 2px; }
+  .row .suggestion { color: var(--success); font-size: 11px; margin-top: 2px; }
+  .machine-tag {
+    margin-left: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--accent); border: 1px solid rgba(232,185,58,0.35); border-radius: 4px; padding: 1px 5px; vertical-align: middle;
+  }
+  .edit-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 6px;
+    padding: 2px 7px; font-size: 11px; cursor: pointer; margin-left: 6px; font-family: 'Barlow', sans-serif;
+  }
+  .edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .edit-select-row { display: none; gap: 6px; margin-top: 6px; }
+  .edit-select-row.open { display: flex; }
+  .edit-select-row select {
+    flex: 1; min-width: 0; background: var(--inputbg); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 6px; font-size: 12px; font-family: 'Barlow', sans-serif;
+  }
+  .edit-select-row button {
+    background: var(--border); border: none; color: var(--text); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif;
+  }
+  .sets-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .set-box { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .set-box .set-lbl { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.05em; }
+  .set-box input {
+    width: 46px; background: var(--inputbg); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); padding: 6px 4px; font-size: 13px; text-align: center; font-family: 'Barlow', sans-serif;
+  }
+  .set-box input.saved { border-color: var(--success); }
+  .abs-label {
+    padding: 10px 18px 4px; font-size: 11px; color: var(--accent); font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Oswald', sans-serif;
+  }
+  .footnote { color: var(--muted2); font-size: 12px; margin-top: 20px; line-height: 1.5; }
+  .code-box {
+    background: var(--card); border: 1px solid var(--accent); border-radius: 8px;
+    padding: 14px 16px; margin-bottom: 20px; text-align: center;
+  }
+  .code-box.stale { border-color: var(--border); }
+  .code-box .code-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Oswald', sans-serif; }
+  .code-box .code-value { font-size: 30px; font-weight: 700; color: var(--accent); letter-spacing: 0.12em; margin: 4px 0; }
+  .code-box.stale .code-value { color: var(--muted2); font-size: 20px; }
+  .code-box .code-note { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .load-code { margin-bottom: 24px; }
+  .load-code-row { display: flex; gap: 8px; }
+  .load-code-row input {
+    flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 12px 14px; font-size: 16px; letter-spacing: 0.1em; text-align: center;
+    font-family: 'Barlow', sans-serif;
+  }
+  .load-code-row button {
+    background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 8px;
+    padding: 0 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    font-family: 'Barlow', sans-serif;
+  }
+  .load-code-row button:hover { border-color: var(--accent); color: var(--accent); }
+  .code-error { color: var(--danger); font-size: 12px; margin-top: 6px; }
+  .progress-back {
+    color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600;
+    display: inline-block; margin-bottom: 16px; cursor: pointer; background: none; border: none;
+    font-family: 'Barlow', sans-serif; padding: 0;
+  }
+  .progress-select {
+    width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 12px; font-size: 15px; margin-bottom: 20px; font-family: 'Barlow', sans-serif;
+  }
+  .progress-chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .progress-empty { color: var(--muted); font-size: 14px; text-align: center; padding: 40px 20px; }
+  @media (max-width: 480px) { h1 { font-size: 28px; } }
