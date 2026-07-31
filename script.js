@@ -15,7 +15,7 @@ const SPLITS = {
   4: ["Tren superior A", "Tren inferior A", "Tren superior B", "Tren inferior B"],
   5: ["Empuje", "Tracción", "Pierna", "Tren superior", "Tren inferior"],
   6: ["Empuje", "Tracción", "Pierna", "Empuje", "Tracción", "Pierna"],
-  7: ["Empuje", "Tracción", "Pierna", "Empuje", "Tracción", "Pierna", "Full Body"],
+  7: ["Empuje", "Tracción", "Pierna", "Descanso activo", "Empuje", "Tracción", "Pierna"],
 };
 
 const GRUPO_POR_SESION = {
@@ -25,6 +25,7 @@ const GRUPO_POR_SESION = {
   "Pierna": "pierna",
   "Tren superior A": "superior", "Tren superior B": "superior", "Tren superior": "superior",
   "Tren inferior A": "pierna", "Tren inferior B": "pierna", "Tren inferior": "pierna",
+  "Descanso activo": "descanso",
 };
 
 const POOLS = {
@@ -95,39 +96,39 @@ const POOLS = {
     { n: "Puente de glúteo a una pierna", m: false, c: false, sg: "gluteo" },
   ],
   superior: [
-    { n: "Press de pecho en máquina", m: true, c: true, fam: "press_pecho_plano" },
-    { n: "Press de hombro en máquina", m: true, c: true, fam: "press_hombro" },
-    { n: "Jalón al pecho en polea", m: true, c: true },
-    { n: "Remo en polea baja (sentado)", m: true, c: true, fam: "remo_horizontal" },
-    { n: "Fondos asistidos en máquina", m: true, c: true, fam: "fondos" },
-    { n: "Dominadas asistidas en máquina", m: true, c: true, fam: "dominadas" },
-    { n: "Curl de bíceps en máquina", m: true, c: false, fam: "curl_biceps" },
-    { n: "Extensión de tríceps en polea", m: true, c: false },
-    { n: "Elevaciones laterales en polea", m: true, c: false, fam: "elevacion_lateral" },
-    { n: "Face pull en polea", m: true, c: false },
-    { n: "Press banca con barra", m: false, c: true, fam: "press_pecho_plano" },
-    { n: "Dominadas pronas", m: false, c: true, fam: "dominadas" },
-    { n: "Press militar de pie", m: false, c: true, fam: "press_hombro" },
-    { n: "Remo con barra", m: false, c: true, fam: "remo_horizontal" },
-    { n: "Fondos en paralelas", m: false, c: true, fam: "fondos" },
-    { n: "Curl de bíceps con barra", m: false, c: false, fam: "curl_biceps" },
+    { n: "Press de pecho en máquina", m: true, c: true, sg: "pecho", fam: "press_pecho_plano" },
+    { n: "Press de hombro en máquina", m: true, c: true, sg: "hombro", fam: "press_hombro" },
+    { n: "Jalón al pecho en polea", m: true, c: true, sg: "espalda" },
+    { n: "Remo en polea baja (sentado)", m: true, c: true, sg: "espalda", fam: "remo_horizontal" },
+    { n: "Fondos asistidos en máquina", m: true, c: true, sg: "triceps", fam: "fondos" },
+    { n: "Dominadas asistidas en máquina", m: true, c: true, sg: "espalda", fam: "dominadas" },
+    { n: "Curl de bíceps en máquina", m: true, c: false, sg: "biceps", fam: "curl_biceps" },
+    { n: "Extensión de tríceps en polea", m: true, c: false, sg: "triceps" },
+    { n: "Elevaciones laterales en polea", m: true, c: false, sg: "hombro", fam: "elevacion_lateral" },
+    { n: "Face pull en polea", m: true, c: false, sg: "espalda" },
+    { n: "Press banca con barra", m: false, c: true, sg: "pecho", fam: "press_pecho_plano" },
+    { n: "Dominadas pronas", m: false, c: true, sg: "espalda", fam: "dominadas" },
+    { n: "Press militar de pie", m: false, c: true, sg: "hombro", fam: "press_hombro" },
+    { n: "Remo con barra", m: false, c: true, sg: "espalda", fam: "remo_horizontal" },
+    { n: "Fondos en paralelas", m: false, c: true, sg: "triceps", fam: "fondos" },
+    { n: "Curl de bíceps con barra", m: false, c: false, sg: "biceps", fam: "curl_biceps" },
   ],
   full: [
-    { n: "Prensa de piernas", m: true, c: true, fam: "prensa_piernas" },
-    { n: "Press de pecho en máquina", m: true, c: true, fam: "press_pecho_plano" },
-    { n: "Remo horizontal en máquina", m: true, c: true, fam: "remo_horizontal" },
-    { n: "Extensión de cuádriceps en máquina", m: true, c: false },
-    { n: "Jalón al pecho en polea", m: true, c: true },
-    { n: "Press de hombro en máquina", m: true, c: true, fam: "press_hombro" },
-    { n: "Curl femoral en máquina", m: true, c: false },
-    { n: "Curl de bíceps en máquina", m: true, c: false, fam: "curl_biceps" },
-    { n: "Sentadilla con barra", m: false, c: true, fam: "sentadilla" },
-    { n: "Press banca con barra", m: false, c: true, fam: "press_pecho_plano" },
-    { n: "Remo con barra", m: false, c: true, fam: "remo_horizontal" },
-    { n: "Peso muerto rumano", m: false, c: true },
-    { n: "Press militar de pie", m: false, c: true, fam: "press_hombro" },
-    { n: "Dominadas pronas", m: false, c: true, fam: "dominadas" },
-    { n: "Zancadas con mancuernas", m: false, c: true },
+    { n: "Prensa de piernas", m: true, c: true, sg: "pierna", fam: "prensa_piernas" },
+    { n: "Press de pecho en máquina", m: true, c: true, sg: "pecho", fam: "press_pecho_plano" },
+    { n: "Remo horizontal en máquina", m: true, c: true, sg: "espalda", fam: "remo_horizontal" },
+    { n: "Extensión de cuádriceps en máquina", m: true, c: false, sg: "pierna" },
+    { n: "Jalón al pecho en polea", m: true, c: true, sg: "espalda" },
+    { n: "Press de hombro en máquina", m: true, c: true, sg: "hombro", fam: "press_hombro" },
+    { n: "Curl femoral en máquina", m: true, c: false, sg: "pierna" },
+    { n: "Curl de bíceps en máquina", m: true, c: false, sg: "biceps", fam: "curl_biceps" },
+    { n: "Sentadilla con barra", m: false, c: true, sg: "pierna", fam: "sentadilla" },
+    { n: "Press banca con barra", m: false, c: true, sg: "pecho", fam: "press_pecho_plano" },
+    { n: "Remo con barra", m: false, c: true, sg: "espalda", fam: "remo_horizontal" },
+    { n: "Peso muerto rumano", m: false, c: true, sg: "pierna" },
+    { n: "Press militar de pie", m: false, c: true, sg: "hombro", fam: "press_hombro" },
+    { n: "Dominadas pronas", m: false, c: true, sg: "espalda", fam: "dominadas" },
+    { n: "Zancadas con mancuernas", m: false, c: true, sg: "pierna" },
   ],
 };
 
@@ -299,8 +300,20 @@ function kcalSesion(sesion, pesoKg) {
 function generarSesion(nombreSesion, rng, pesos, usadosSemana) {
   usadosSemana = usadosSemana || new Set();
   const grupo = GRUPO_POR_SESION[nombreSesion] || "full";
+  // Día de descanso activo: solo la cinta de calentamiento, sin ejercicios de fuerza
+  // ni abdominales. Se usa en el split de 7 días para que siempre haya, al menos,
+  // un día sin trabajo de fuerza y el cuerpo pueda recuperar.
+  if (grupo === "descanso") {
+    return {
+      nombre: nombreSesion,
+      grupo: grupo,
+      calentamiento: { nombre: "Cinta / cardio suave", detalle: "10 min, ritmo cómodo para elevar pulsaciones" },
+      ejercicios: [],
+      abdominales: [],
+    };
+  }
   const pool = POOLS[grupo];
-  const nEjercicios = grupo === "full" ? 6 : 7;
+  const nEjercicios = grupo === "full" ? 5 : 6;
   const elegidos = pickPriorizandoMaquinas(pool, nEjercicios, rng, pesos, usadosSemana);
   const abs = pickPriorizandoMaquinas(ABDOMINALES, 3, rng, pesos, usadosSemana);
   elegidos.forEach((e) => { usadosSemana.add(e.n); if (e.fam) usadosSemana.add(`fam:${e.fam}`); });
@@ -1160,6 +1173,7 @@ function render() {
     const fechaDiaStr = formatFechaLocal(fechaDia);
     const esPasado = fechaDia < hoy;
     const mostrarAviso = esPasado && !hecho;
+    const esDescanso = sesion.grupo === "descanso";
     return `
     <div class="day-card" data-day-index="${index}">
       <div class="day-head">
@@ -1174,7 +1188,7 @@ function render() {
             <div class="lbl">kcal</div>
           </div>` : ''}
           <button class="hecho-btn${hecho ? ' done' : ''}" data-hecho="${index}">${hecho ? '✓ Hecho' : 'Marcar hecho'}</button>
-          <button class="regen-btn" data-regen="${index}">↻ Variar</button>
+          ${esDescanso ? '' : `<button class="regen-btn" data-regen="${index}">↻ Variar</button>`}
         </div>
       </div>
       ${mostrarAviso ? `<div class="warning-badge">⚠ No marcaste este día como hecho</div>` : ''}
@@ -1182,9 +1196,15 @@ function render() {
         <span>🏃 ${sesion.calentamiento.nombre}</span>
         <span class="detalle">${sesion.calentamiento.detalle}</span>
       </div>
+      ${esDescanso ? `
+      <div class="row" style="color:var(--muted); font-style:italic;">
+        Día de descanso activo: solo la cinta, sin ejercicios de fuerza ni abdominales. Deja que el cuerpo recupere.
+      </div>
+      ` : `
       ${sesion.ejercicios.map((ej, i) => filaEjercicioHTML(ej, i, true, index, "principal", sesion.grupo, fechaDiaStr)).join("")}
       <div class="abs-label">Abdominales</div>
       ${sesion.abdominales.map((ej, i) => filaEjercicioHTML(ej, i, false, index, "abs", "abs", fechaDiaStr)).join("")}
+      `}
     </div>
   `;
   }).join("");
