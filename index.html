@@ -15,7 +15,7 @@
 <div class="wrap" id="mainView">
   <div class="badge">Cinta 10' → Fuerza → Abdominales</div>
   <h1 class="oswald">GENERADOR<br/>DE ENTRENOS</h1>
-  <p class="subtitle">Elige los días que entrenas. Anota el peso que uses en cada ejercicio y la próxima vez que te toque verás con qué kilos empezaste la última vez.</p>
+  <p class="subtitle">Elige cuántos días entrenas por semana. Se genera el mismo plan para todo el mes — los ejercicios no cambian, solo tú cada semana marcas lo que has hecho y anotas los pesos que usas.</p>
 
   <div class="racha-badge" id="rachaBadge" style="display:none;"></div>
 
@@ -51,13 +51,13 @@
       <div class="peso-error" id="pesoError" style="display:none;">Introduce tu peso antes de generar el entrenamiento.</div>
     </div>
 
-    <div class="section-label">¿Qué días entrenas?</div>
+    <div class="section-label">¿Cuántos días entrenas por semana?</div>
     <div class="days" id="days"></div>
 
     <div class="section-label">¿Qué prefieres priorizar?</div>
     <div class="days" id="prioridad"></div>
 
-    <button class="gen-btn oswald" id="genBtn" disabled>Generar entrenamientos</button>
+    <button class="gen-btn oswald" id="genBtn" disabled>Generar entrenamientos del mes</button>
   </div>
 
   <div class="undo-box" id="undoBox" style="display:none;">
@@ -66,23 +66,23 @@
   </div>
 
   <div class="code-box" id="codeBox" style="display:none;">
-    <div class="code-lbl">Tu código para compartir</div>
+    <div class="code-lbl">Código del mes</div>
     <div class="code-value oswald">000000</div>
     <div class="code-note"></div>
-    <button class="regen-btn" id="resetCodeBtn" style="display:none; margin-top:10px;">Descartar cambios y generar código limpio</button>
+    <button class="regen-btn" id="resetCodeBtn" style="display:none; margin-top:10px;">Descartar cambios y regenerar código</button>
   </div>
 
   <div class="load-code" id="loadCodeSection">
-    <div class="section-label">¿Tienes un código de tu compañero/a?</div>
+    <div class="section-label">¿Tienes el código de tu compañero/a?</div>
     <div class="load-code-row">
       <input type="text" inputmode="numeric" maxlength="6" placeholder="123456" id="codeInput" />
-      <button id="loadCodeBtn">Cargar entrenamiento</button>
+      <button id="loadCodeBtn">Cargar plan</button>
     </div>
     <div class="code-error" id="codeError" style="display:none;"></div>
   </div>
 
   <div class="total-week" id="totalWeek" style="display:none;">
-    <span>Total estimado de la semana</span>
+    <span>Total estimado por semana</span>
     <span class="val" id="totalWeekVal">~0 kcal</span>
   </div>
 
@@ -92,11 +92,7 @@
   <div id="plan"></div>
 
   <p class="footnote" id="footnote" style="display:none;">
-    Puedes anotar el peso de cada serie por separado (S1, S2, S3...). Se guardan en este dispositivo
-    (en este navegador) al salir de cada casilla. Cuando el ejercicio se repita en una futura sesión,
-    verás "última vez" con el peso de cada serie y la fecha, para saber por dónde empezar.
-    Las calorías se calculan con tu peso corporal y una estimación de esfuerzo (MET) por tipo de
-    ejercicio y descanso entre series — es una aproximación razonable, no una medición exacta.
+    Los ejercicios son los mismos cada semana durante todo el mes. Anota el peso de cada serie (S1, S2…) al acabar — se guarda en este dispositivo al salir del campo. La siguiente semana los campos empiezan vacíos pero "última vez" te muestra lo que usaste para que puedas progresar. Al marcar un día como hecho queda registrado en el historial.
   </p>
 </div>
 
@@ -116,7 +112,6 @@
 </div>
 
 <footer class="app-footer">
-
   <span id="copyrightYear"></span> Alejandro Arévalo Romero. Todos los derechos reservados.
 </footer>
 
