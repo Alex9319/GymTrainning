@@ -26,12 +26,12 @@ const GRUPOS_DISPLAY = {
   descanso: "Cardio suave — recuperación activa",
 };
 
-// Periodización mensual de 4 semanas
-const PERIODIZACION = {
-  1: { label: "Semana 1 — Adaptación 🌱", clase: "adaptacion", seriesComp: 3, seriesIsol: 3, repsComp: "12-15", repsIsol: "15-20", descansoComp: "60-90 seg", descansoIsol: "45-60 seg", descansoAbs: "45 seg", nota: "Cargas moderadas (~70%). Aprende los movimientos, no fuerces. Prioriza la técnica." },
-  2: { label: "Semana 2 — Progresión 📈", clase: "progresion", seriesComp: 4, seriesIsol: 3, repsComp: "10-12", repsIsol: "12-15", descansoComp: "90-120 seg", descansoIsol: "60-90 seg", descansoAbs: "45-60 seg", nota: "Sube la carga respecto a la semana pasada. Busca el fallo técnico en la última serie." },
-  3: { label: "Semana 3 — Sobrecarga 💪", clase: "sobrecarga", seriesComp: 4, seriesIsol: 4, repsComp: "6-8", repsIsol: "10-12", descansoComp: "2-3 min", descansoIsol: "90 seg", descansoAbs: "60 seg", nota: "Cargas altas (~85%). Si completas todas las reps con buena técnica, sube 2,5 kg la semana que viene." },
-  4: { label: "Semana 4 — Descarga 💤", clase: "descarga", seriesComp: 2, seriesIsol: 2, repsComp: "12-15", repsIsol: "15-20", descansoComp: "60 seg", descansoIsol: "45 seg", descansoAbs: "30 seg", nota: "Reduce la carga al 60%. Esta semana el cuerpo consolida las adaptaciones. No te saltes el descanso activo." },
+// Plan fijo indefinido: mismos series/reps cada semana
+const PLAN_FIJO = {
+  seriesComp: 4, repsComp: "8-10", descansoComp: "2-3 min",
+  seriesIsol: 3, repsIsol: "10-12", descansoIsol: "90 seg",
+  descansoAbs: "45 seg",
+  nota: "Plan indefinido. Sube 2,5kg cuando completes todas las reps con buena técnica. Genera una nueva rutina cuando quieras cambiar.",
 };
 
 const POOLS = {
@@ -138,7 +138,6 @@ const POOLS = {
   ],
 };
 
-// Solo 3 ejercicios de abdominales: máquina, planchas, elevaciones de piernas
 const ABDOMINALES = [
   { n: "Máquina de abdominales", m: true },
   { n: "Plancha frontal", m: false },
@@ -157,7 +156,7 @@ function registrarEjercicio(n, sg) { const s = slugify(n); SLUG_A_NOMBRE[s] = n;
 ABDOMINALES.forEach(e => registrarEjercicio(e.n, "abs"));
 
 // ================================================================
-// LÓGICA DE GENERACIÓN
+// LÓGICA
 // ================================================================
 function crearRng(semilla) {
   let a = semilla >>> 0;
@@ -206,7 +205,7 @@ function generarSesion(nombre, rng, pesos, usados) {
   const pool = POOLS[grupo];
   const nEj = grupo==="full"?5:6;
   const elegidos = pickPriorizandoMaquinas(pool,nEj,rng,pesos,usados);
-  const abs = pickPriorizandoMaquinas(ABDOMINALES,2,rng,pesos,usados); // 2 ejercicios de abs al día
+  const abs = pickPriorizandoMaquinas(ABDOMINALES,2,rng,pesos,usados);
   elegidos.forEach(e=>{usados.add(e.n);if(e.fam)usados.add(`fam:${e.fam}`);});
   abs.forEach(e=>{usados.add(e.n);if(e.fam)usados.add(`fam:${e.fam}`);});
   return {
@@ -217,14 +216,11 @@ function generarSesion(nombre, rng, pesos, usados) {
 }
 
 // ================================================================
-// CÓDIGO Y PLAN MENSUAL
+// CÓDIGO Y PLAN
 // ================================================================
-function calcularYearMonth() { const n=new Date(); return n.getFullYear()*100+(n.getMonth()+1); }
-function semanaDelMes() { return Math.min(Math.ceil(new Date().getDate()/7),4); }
-
 function generarCodigo(numDias, prioridad) {
   const pIdx=PRIORIDAD_ORDEN.indexOf(prioridad), meta=numDias*3+pIdx;
-  return meta*1000+(calcularYearMonth()%1000);
+  return meta*1000+(Date.now()%1000);
 }
 function decodificarCodigo(codigo) {
   const meta=Math.floor(codigo/1000), numDias=Math.floor(meta/3), pIdx=meta%3;
@@ -236,12 +232,31 @@ function construirPlan(numDias, prioridad, semilla) {
   const pesos=PRIORIDAD_PESOS[prioridad], splits=SPLITS[Math.min(numDias,7)], usados=new Set();
   return splits.map((nombre,i)=>({label:`Día ${i+1}`,sesion:generarSesion(nombre,rng,pesos,usados)}));
 }
-function clavePlan(nD,pr) { const pI=PRIORIDAD_ORDEN.indexOf(pr); return `planMensual:${calcularYearMonth()}:${nD}:${pI}`; }
-function guardarPlanMensual() { try{localStorage.setItem(clavePlan(numDias,prioridad),JSON.stringify({plan,numDias,prioridad,codigoActual,codigoDesactualizado}));}catch(e){} }
-function cargarPlanMensual(nD,pr) { try{const r=localStorage.getItem(clavePlan(nD,pr));return r?JSON.parse(r):null;}catch(e){return null;} }
+// Hash estable de los ejercicios seleccionados: el código se adapta si editas algo
+function hashTexto(str) { let h=0; for(let i=0;i<str.length;i++){h=(Math.imul(31,h)+str.charCodeAt(i))|0;} return Math.abs(h); }
+function hashPlan(plan) {
+  const nombres = plan.flatMap(({sesion})=>[sesion.nombre, ...sesion.ejercicios.map(e=>e.nombre), ...sesion.abdominales.map(e=>e.nombre)]).join("|");
+  return hashTexto(nombres) % 1000;
+}
+function generarCodigoDesdePlan(numDias, prioridad, plan) {
+  const pIdx=PRIORIDAD_ORDEN.indexOf(prioridad), meta=numDias*3+pIdx;
+  return meta*1000 + hashPlan(plan);
+}
+function clavePlan(nD,pr) { return `planIndefinido:${nD}:${pr}`; }
+function guardarPlan() { try{localStorage.setItem(clavePlan(numDias,prioridad),JSON.stringify({plan,numDias,prioridad,codigoActual}));}catch(e){} }
+function cargarPlan(nD,pr) { try{const r=localStorage.getItem(clavePlan(nD,pr));return r?JSON.parse(r):null;}catch(e){return null;} }
+function clavePlanPorCodigo(codigo) { return `planCodigo:${codigo}`; }
+function guardarPlanPorCodigo(codigo) { try{localStorage.setItem(clavePlanPorCodigo(codigo),JSON.stringify({plan,numDias,prioridad}));}catch(e){} }
+function cargarPlanPorCodigo(codigo) { try{const r=localStorage.getItem(clavePlanPorCodigo(codigo));return r?JSON.parse(r):null;}catch(e){return null;} }
+// Recalcula el código a partir de los ejercicios actuales y guarda todo
+function actualizarCodigoYGuardar() {
+  codigoActual = generarCodigoDesdePlan(numDias, prioridad, plan);
+  guardarPlan();
+  guardarPlanPorCodigo(codigoActual);
+}
 
 // ================================================================
-// FECHAS Y SEMANAS
+// FECHAS
 // ================================================================
 function calcularSemanaId(fecha) {
   const d=new Date(Date.UTC(fecha.getFullYear(),fecha.getMonth(),fecha.getDate()));
@@ -253,7 +268,7 @@ function fechaParaSesion(idx) { const h=new Date(),l=new Date(h); l.setHours(0,0
 function formatFechaLocal(f) { return `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,"0")}-${String(f.getDate()).padStart(2,"0")}`; }
 
 // ================================================================
-// HISTORIAL DE PESOS
+// HISTORIAL
 // ================================================================
 function getHistorial(slug,n) { try{const r=localStorage.getItem(`serie:${slug}:s${n}`);return r?JSON.parse(r):[];}catch(e){return[];} }
 function guardarHistorial(slug,n,weight,fecha) {
@@ -266,7 +281,7 @@ function limiteInicioSemana() { return formatFechaLocal(fechaParaSesion(0)); }
 function ultimaAntesDeEstaSemana(slug,n) { const arr=getHistorial(slug,n),lim=limiteInicioSemana(); for(let i=arr.length-1;i>=0;i--) if(arr[i].date<lim) return arr[i]; return null; }
 
 // ================================================================
-// PESOS DE LA SEMANA ACTUAL
+// PESOS SEMANA
 // ================================================================
 function claveSemanaPesos() { return `semana:${calcularSemanaId(new Date())}`; }
 function getPesosSemana() { try{const r=localStorage.getItem(claveSemanaPesos());return r?JSON.parse(r):{}}catch(e){return{};} }
@@ -274,7 +289,7 @@ function pesoSemana(slug,n) { const v=getPesosSemana()[`${slug}:s${n}`]; return 
 function guardarPesoSemana(slug,n,w) { const d=getPesosSemana(); d[`${slug}:s${n}`]=w; localStorage.setItem(claveSemanaPesos(),JSON.stringify(d)); }
 
 // ================================================================
-// REFERENCIAS Y SUGERENCIAS
+// REFERENCIAS
 // ================================================================
 function buscarRefGrupo(slugActual) {
   const gs=SLUG_A_GRUPOS[slugActual]; if(!gs) return null;
@@ -295,14 +310,6 @@ function formatUltimaVez(slug,nSeries) {
   const r=buscarRefGrupo(slug); if(r) return ` · ref. grupo: ${r.weight} kg (${SLUG_A_NOMBRE[r.slug]||r.slug}, ${r.date})`;
   return "";
 }
-
-// ================================================================
-// FEEDBACK DE DIFICULTAD
-// ================================================================
-function claveFeedback(semanaId,idx) { return `feedback:${semanaId}:${idx}`; }
-function getFeedback(semanaId,idx) { try{const r=localStorage.getItem(claveFeedback(semanaId,idx));return r?parseInt(r,10):null;}catch(e){return null;} }
-function setFeedback(semanaId,idx,v) { localStorage.setItem(claveFeedback(semanaId,idx),String(v)); }
-const FEEDBACK_LABELS = ["","😴 Muy fácil","😊 Fácil","💪 Perfecto","🔥 Duro","😤 Muy duro"];
 
 // ================================================================
 // OTROS
@@ -341,9 +348,9 @@ function getTema() { return localStorage.getItem("tema"); }
 function setTema(v) { localStorage.setItem("tema",v); }
 
 // ================================================================
-// DOM + ESTADO
+// DOM
 // ================================================================
-let numDias=0, prioridad="maquina", plan=null, codigoActual=null, codigoDesactualizado=false, ultimoSnapshot=null, calcularCalorias=true;
+let numDias=0, prioridad="maquina", plan=null, codigoActual=null, ultimoSnapshot=null, calcularCalorias=true;
 
 const $=id=>document.getElementById(id);
 const mainViewEl=$("mainView"), progressViewEl=$("progressView"), historyViewEl=$("historyView");
@@ -369,7 +376,7 @@ function aplicarTema(t){ if(t==="light"){document.documentElement.classList.add(
 aplicarTema(temaActual);
 temaBtnEl.addEventListener("click",()=>{temaActual=temaActual==="light"?"dark":"light";setTema(temaActual);aplicarTema(temaActual);if(plan)dibujarGraficaSiVisible();});
 
-// ---- Peso corporal ----
+// ---- Peso ----
 let pesoUsuarioActual=getPesoUsuario();
 function mostrarPesoVista(v){pesoViewTextEl.textContent=`Peso guardado: ${v} kg`;pesoViewEl.style.display="flex";pesoEditEl.style.display="none";}
 function mostrarPesoEdicion(){pesoUsuarioEl.value=pesoUsuarioActual||"";pesoViewEl.style.display="none";pesoEditEl.style.display="block";pesoUsuarioEl.focus();}
@@ -378,14 +385,14 @@ if(pesoUsuarioActual) mostrarPesoVista(pesoUsuarioActual); else mostrarPesoEdici
 pesoModLinkEl.addEventListener("click",e=>{e.preventDefault();mostrarPesoEdicion();});
 pesoUsuarioEl.addEventListener("change",()=>{const v=parseFloat(pesoUsuarioEl.value);if(!isNaN(v)&&v>0){guardarPeso(v);if(plan)render();}});
 
-// ---- Toggle calorías ----
+// ---- Calorías ----
 calcularCalCheckEl.checked=true;
 calcularCalCheckEl.addEventListener("change",()=>{calcularCalorias=calcularCalCheckEl.checked;pesoSectionEl.style.display=calcularCalorias?"block":"none";pesoErrorEl.style.display="none";if(plan)render();});
 
 // ---- Config ----
 function colapsarConfig(){
   configOptionsEl.style.display="none";configResumenEl.style.display="flex";
-  configResumenCodeEl.textContent=codigoDesactualizado?"Código no disponible (has hecho cambios)":`Código: ${String(codigoActual).padStart(6,"0")}`;
+  configResumenCodeEl.textContent=`Código: ${String(codigoActual).padStart(6,"0")}`;
   configResumenDetalleEl.textContent=`${numDias} día${numDias===1?"":"s"}/semana · ${PRIORIDAD_LABELS[prioridad]}`;
 }
 function expandirConfig(){configOptionsEl.style.display="block";configResumenEl.style.display="none";}
@@ -409,21 +416,21 @@ function actualizarChipsUI(){
 }
 
 // ---- Generar plan ----
-function regenerarPlanLimpio(){
-  plan=construirPlan(numDias,prioridad); codigoActual=generarCodigo(numDias,prioridad); codigoDesactualizado=false; ultimoSnapshot=null;
-  guardarPlanMensual(); render();
-}
-resetCodeBtnEl.addEventListener("click",regenerarPlanLimpio);
-
 genBtn.onclick=()=>{
   if(!numDias) return;
   if(calcularCalorias){const v=pesoUsuarioActual||parseFloat(pesoUsuarioEl.value);if(isNaN(v)||!v||v<=0){pesoErrorEl.style.display="block";mostrarPesoEdicion();return;}guardarPeso(v);}
-  const guardado=cargarPlanMensual(numDias,prioridad);
-  if(guardado&&guardado.plan){plan=guardado.plan;codigoActual=guardado.codigoActual;codigoDesactualizado=!!guardado.codigoDesactualizado;}
-  else{plan=construirPlan(numDias,prioridad);codigoActual=generarCodigo(numDias,prioridad);codigoDesactualizado=false;guardarPlanMensual();}
+  const guardado=cargarPlan(numDias,prioridad);
+  if(guardado&&guardado.plan){plan=guardado.plan;codigoActual=guardado.codigoActual;}
+  else{plan=construirPlan(numDias,prioridad);actualizarCodigoYGuardar();}
   localStorage.setItem("config:numDias",numDias);localStorage.setItem("config:prioridad",prioridad);
-  ultimoSnapshot=null; genBtn.textContent="Cambiar configuración"; colapsarConfig(); render();
+  ultimoSnapshot=null; genBtn.textContent="Generar nueva rutina"; colapsarConfig(); render();
 };
+
+// ---- Nueva rutina ----
+resetCodeBtnEl.addEventListener("click",()=>{
+  plan=construirPlan(numDias,prioridad);
+  ultimoSnapshot=null; actualizarCodigoYGuardar(); render();
+});
 
 // ---- Cargar por código ----
 loadCodeBtn.onclick=()=>{
@@ -434,8 +441,10 @@ loadCodeBtn.onclick=()=>{
   const dec=decodificarCodigo(val);
   if(!dec){codeErrorEl.textContent="Ese código no es válido.";codeErrorEl.style.display="block";return;}
   numDias=dec.numDias;prioridad=dec.prioridad;
-  plan=construirPlan(numDias,prioridad,val);codigoActual=val;codigoDesactualizado=false;
-  actualizarChipsUI();genBtn.textContent="Cambiar configuración";colapsarConfig();render();
+  const guardadoPorCodigo=cargarPlanPorCodigo(val);
+  if(guardadoPorCodigo&&guardadoPorCodigo.plan){plan=guardadoPorCodigo.plan;codigoActual=val;guardarPlan();}
+  else{plan=construirPlan(numDias,prioridad,val);actualizarCodigoYGuardar();}
+  actualizarChipsUI();genBtn.textContent="Generar nueva rutina";colapsarConfig();render();
 };
 
 $("copyrightYear").textContent="© "+new Date().getFullYear();
@@ -445,7 +454,7 @@ function actualizarRacha(){const r=calcularRacha();if(r>0){rachaBadgeEl.style.di
 
 // ---- Deshacer ----
 function guardarSnapshot(){ultimoSnapshot=JSON.parse(JSON.stringify(plan));}
-undoBtnEl.addEventListener("click",()=>{if(!ultimoSnapshot)return;plan=ultimoSnapshot;ultimoSnapshot=null;codigoDesactualizado=true;guardarPlanMensual();render();});
+undoBtnEl.addEventListener("click",()=>{if(!ultimoSnapshot)return;plan=ultimoSnapshot;ultimoSnapshot=null;guardarPlan();render();});
 
 // ---- Progreso ----
 function hayProgreso(){for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("serie:"))return true;}return false;}
@@ -502,28 +511,27 @@ function dibujarGrafica(canvas,datos){
 }
 
 // ================================================================
-// RENDER PRINCIPAL
+// RENDER
 // ================================================================
-function filaEjercicioHTML(ej, posIdx, mostrarNum, dayIdx, tipo, poolGrupo, fechaDia, periodo) {
-  const slug=slugify(ej.nombre), nS=ej.series;
+function filaEjercicioHTML(ej, posIdx, mostrarNum, dayIdx, tipo, poolGrupo, fechaDia) {
+  const slug=slugify(ej.nombre), nS=PLAN_FIJO[ej.c?'seriesComp':'seriesIsol'];
+  const reps = ej.c ? PLAN_FIJO.repsComp : PLAN_FIJO.repsIsol;
+  const descanso = ej.c ? PLAN_FIJO.descansoComp : PLAN_FIJO.descansoIsol;
   const numLabel=mostrarNum?(posIdx+1)+". ":"";
-  const seriesRender = ej.c ? periodo.seriesComp : periodo.seriesIsol;
-  const repsRender = ej.c ? periodo.repsComp : periodo.repsIsol;
-  const descanso = ej.c ? periodo.descansoComp : periodo.descansoIsol;
-  const setsHtml=Array.from({length:seriesRender}).map((_,s)=>{
+  const setsHtml=Array.from({length:nS}).map((_,s)=>{
     const ant=ultimaAntesDeEstaSemana(slug,s), pAct=pesoSemana(slug,s);
     const valor=pAct!==null?pAct:(entradaEnFecha(slug,s,fechaDia)||{}).weight;
     return `<div class="set-box"><span class="set-lbl">S${s+1}</span><input type="number" inputmode="decimal" data-slug="${slug}" data-set="${s}" data-fecha="${fechaDia}" value="${valor!==undefined&&valor!==null?valor:""}" placeholder="${ant?ant.weight:"kg"}" /></div>`;
   }).join("");
   const opciones=(poolGrupo==="abs"?ABDOMINALES:POOLS[poolGrupo]).filter(e=>e.n!==ej.nombre);
   const selId=`edit-${dayIdx}-${tipo}-${posIdx}`;
-  return `<div class="row" data-exslug="${slug}" data-exseries="${seriesRender}">
+  return `<div class="row" data-exslug="${slug}" data-exseries="${nS}">
     <div class="info">
       <div>${numLabel}${ej.nombre}${ej.maquina?'<span class="machine-tag">MÁQUINA</span>':''}${ej.c?'<span class="compound-tag">COMP</span>':''}
         <button class="edit-btn" data-toggle-edit="${selId}">✎</button>
         <span class="descanso-tag">⏱ ${descanso}</span>
       </div>
-      <div class="sub" data-sub="${slug}">${seriesRender}x${repsRender}${formatUltimaVez(slug,seriesRender)}</div>
+      <div class="sub" data-sub="${slug}">${nS}x${reps}${formatUltimaVez(slug,nS)}</div>
     </div>
     <div class="sets-row">${setsHtml}</div>
     <div class="edit-select-row" id="${selId}">
@@ -537,7 +545,7 @@ function filaEjercicioHTML(ej, posIdx, mostrarNum, dayIdx, tipo, poolGrupo, fech
 
 function render() {
   if (!plan) return;
-  guardarPlanMensual();
+  guardarPlan();
   loadCodeSectionEl.style.display="none";
   actualizarRacha();
   progressLinkBtnEl.style.display=hayProgreso()?"block":"none";
@@ -554,33 +562,25 @@ function render() {
 
   if(codigoActual!=null){
     codeBoxEl.style.display="block";
-    if(codigoDesactualizado){codeBoxEl.classList.add("stale");codeBoxEl.querySelector(".code-value").textContent="— — — — — —";codeBoxEl.querySelector(".code-note").textContent="Has cambiado ejercicios, el código ya no coincide. Descarta los cambios para recuperarlo.";resetCodeBtnEl.style.display="block";}
-    else{codeBoxEl.classList.remove("stale");codeBoxEl.querySelector(".code-value").textContent=String(codigoActual).padStart(6,"0");codeBoxEl.querySelector(".code-note").textContent="Este código genera el mismo plan para todo el mes. Compártelo con tu compañero/a.";resetCodeBtnEl.style.display="none";}
+    codeBoxEl.classList.remove("stale");
+    codeBoxEl.querySelector(".code-value").textContent=String(codigoActual).padStart(6,"0");
+    codeBoxEl.querySelector(".code-note").textContent="El código se adapta a tus ejercicios actuales. Si cambias uno, cambia el código. Sube 2,5kg cuando completes todas las reps con buena técnica.";
+    resetCodeBtnEl.textContent="Generar nueva rutina";
+    resetCodeBtnEl.style.display="block";
   }
 
   const sid=calcularSemanaId(new Date()), hoy=new Date(); hoy.setHours(0,0,0,0);
-  const semana=semanaDelMes(), periodo=PERIODIZACION[semana];
 
-  const bannerHtml=`<div class="periodo-banner ${periodo.clase}">
-    <div class="periodo-titulo">${periodo.label}</div>
-    <div class="periodo-nota">${periodo.nota}</div>
-    <div class="periodo-chips">
-      ${[1,2,3,4].map(i=>`<span class="periodo-chip${i===semana?(semana===4?" descarga-chip":" activa"):""}">${PERIODIZACION[i].label.split("—")[1].trim()}</span>`).join("")}
-    </div>
+  const bannerHtml=`<div class="periodo-banner adaptacion">
+    <div class="periodo-titulo">📌 Plan Indefinido</div>
+    <div class="periodo-nota">${PLAN_FIJO.nota}</div>
   </div>`;
 
   planEl.innerHTML = bannerHtml + plan.map(({label,sesion},index)=>{
     const hecho=estaHecho(sid,index), fechaDia=fechaParaSesion(index), fechaDiaStr=formatFechaLocal(fechaDia);
     const esPasado=fechaDia<hoy, esDescanso=sesion.grupo==="descanso";
-    const fb=getFeedback(sid,index);
     const gruposStr=GRUPOS_DISPLAY[sesion.grupo]||"";
-    const feedbackHtml=hecho?`<div class="feedback-box">
-      <div class="feedback-label">¿Cómo fue la sesión?</div>
-      <div class="feedback-btns">
-        ${[1,2,3,4,5].map(v=>`<button class="feedback-btn${fb===v?" activo":""}" data-fb-dia="${index}" data-fb-val="${v}">${FEEDBACK_LABELS[v]}</button>`).join("")}
-      </div>
-    </div>`:"";
-    return `<div class="day-card${semana===4?" descarga-semana":""}" data-day-index="${index}">
+    return `<div class="day-card" data-day-index="${index}">
       <div class="day-head">
         <div>
           <div class="dia-full">${label}</div>
@@ -599,11 +599,10 @@ function render() {
       </div>
       ${esDescanso
         ?`<div class="row" style="color:var(--muted);font-style:italic;">Día de descanso activo: solo cardio suave, sin ejercicios de fuerza. Deja que el cuerpo recupere.</div>`
-        :`${sesion.ejercicios.map((ej,i)=>filaEjercicioHTML(ej,i,true,index,"principal",sesion.grupo,fechaDiaStr,periodo)).join("")}
-         <div class="abs-label">Abdominales · ${periodo.descansoAbs} descanso</div>
-         ${sesion.abdominales.map((ej,i)=>filaEjercicioHTML(ej,i,false,index,"abs","abs",fechaDiaStr,periodo)).join("")}`
+        :`${sesion.ejercicios.map((ej,i)=>filaEjercicioHTML(ej,i,true,index,"principal",sesion.grupo,fechaDiaStr)).join("")}
+         <div class="abs-label">Abdominales · ${PLAN_FIJO.descansoAbs} descanso</div>
+         ${sesion.abdominales.map((ej,i)=>filaEjercicioHTML(ej,i,false,index,"abs","abs",fechaDiaStr)).join("")}`
       }
-      ${feedbackHtml}
     </div>`;
   }).join("");
 
@@ -620,14 +619,6 @@ function render() {
     });
   });
 
-  // Feedback
-  planEl.querySelectorAll("[data-fb-dia]").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const idx=parseInt(btn.dataset.fbDia,10), val=parseInt(btn.dataset.fbVal,10);
-      setFeedback(sid,idx,val); render();
-    });
-  });
-
   // Variar
   planEl.querySelectorAll("[data-regen]").forEach(btn=>{
     btn.addEventListener("click",()=>{
@@ -635,7 +626,7 @@ function render() {
       const usados=new Set();
       plan.forEach((p,i)=>{if(i===idx)return;p.sesion.ejercicios.forEach(e=>{usados.add(e.nombre);if(NOMBRE_A_FAM[e.nombre])usados.add(`fam:${NOMBRE_A_FAM[e.nombre]}`);});p.sesion.abdominales.forEach(e=>{usados.add(e.nombre);if(NOMBRE_A_FAM[e.nombre])usados.add(`fam:${NOMBRE_A_FAM[e.nombre]}`);});});
       plan[idx].sesion=generarSesion(plan[idx].sesion.nombre,Math.random,PRIORIDAD_PESOS[prioridad],usados);
-      codigoDesactualizado=true; guardarPlanMensual(); render();
+      actualizarCodigoYGuardar(); render();
     });
   });
 
@@ -663,7 +654,7 @@ function render() {
       const el=fuente.find(e=>e.n===nn); if(!el) return; guardarSnapshot();
       if(tipo==="abs"){const act=plan[dI].sesion.abdominales[pI];plan[dI].sesion.abdominales[pI]={nombre:el.n,maquina:el.m,series:3,reps:el.n.includes("Plancha")?"45-60 seg":"10-12"};}
       else plan[dI].sesion.ejercicios[pI]={nombre:el.n,maquina:el.m,c:el.c,sg:el.sg,...repsFor(el.n,Math.random)};
-      codigoDesactualizado=true; guardarPlanMensual(); render();
+      actualizarCodigoYGuardar(); render();
     });
   });
 }
@@ -672,5 +663,5 @@ function render() {
 (function init(){
   const nd=parseInt(localStorage.getItem("config:numDias")||"0",10);
   const pr=localStorage.getItem("config:prioridad")||"maquina";
-  if(nd>=1&&nd<=7){numDias=nd;prioridad=pr;actualizarChipsUI();const g=cargarPlanMensual(nd,pr);if(g&&g.plan){plan=g.plan;codigoActual=g.codigoActual;codigoDesactualizado=!!g.codigoDesactualizado;genBtn.textContent="Cambiar configuración";colapsarConfig();render();}}
+  if(nd>=1&&nd<=7){numDias=nd;prioridad=pr;actualizarChipsUI();const g=cargarPlan(nd,pr);if(g&&g.plan){plan=g.plan;codigoActual=g.codigoActual;genBtn.textContent="Generar nueva rutina";colapsarConfig();render();}}
 })();
