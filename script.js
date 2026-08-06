@@ -220,7 +220,8 @@ function generarSesion(nombre, rng, pesos, usados) {
 // ================================================================
 function generarCodigo(numDias, prioridad) {
   const pIdx=PRIORIDAD_ORDEN.indexOf(prioridad), meta=numDias*3+pIdx;
-  return meta*1000+(Date.now()%1000);
+  const sufijo=Math.floor(Math.random()*1000);
+  return meta*1000+sufijo;
 }
 function decodificarCodigo(codigo) {
   const meta=Math.floor(codigo/1000), numDias=Math.floor(meta/3), pIdx=meta%3;
@@ -228,31 +229,27 @@ function decodificarCodigo(codigo) {
   return { numDias, prioridad:PRIORIDAD_ORDEN[pIdx] };
 }
 function construirPlan(numDias, prioridad, semilla) {
-  const rng=crearRng(semilla!=null?semilla:generarCodigo(numDias,prioridad));
+  const rng=crearRng(semilla);
   const pesos=PRIORIDAD_PESOS[prioridad], splits=SPLITS[Math.min(numDias,7)], usados=new Set();
   return splits.map((nombre,i)=>({label:`Día ${i+1}`,sesion:generarSesion(nombre,rng,pesos,usados)}));
 }
-// Hash estable de los ejercicios seleccionados: el código se adapta si editas algo
-function hashTexto(str) { let h=0; for(let i=0;i<str.length;i++){h=(Math.imul(31,h)+str.charCodeAt(i))|0;} return Math.abs(h); }
-function hashPlan(plan) {
-  const nombres = plan.flatMap(({sesion})=>[sesion.nombre, ...sesion.ejercicios.map(e=>e.nombre), ...sesion.abdominales.map(e=>e.nombre)]).join("|");
-  return hashTexto(nombres) % 1000;
-}
-function generarCodigoDesdePlan(numDias, prioridad, plan) {
-  const pIdx=PRIORIDAD_ORDEN.indexOf(prioridad), meta=numDias*3+pIdx;
-  return meta*1000 + hashPlan(plan);
-}
 function clavePlan(nD,pr) { return `planIndefinido:${nD}:${pr}`; }
-function guardarPlan() { try{localStorage.setItem(clavePlan(numDias,prioridad),JSON.stringify({plan,numDias,prioridad,codigoActual}));}catch(e){} }
+function guardarPlan() { try{localStorage.setItem(clavePlan(numDias,prioridad),JSON.stringify({plan,numDias,prioridad,codigoActual,planEditado}));}catch(e){} }
 function cargarPlan(nD,pr) { try{const r=localStorage.getItem(clavePlan(nD,pr));return r?JSON.parse(r):null;}catch(e){return null;} }
-function clavePlanPorCodigo(codigo) { return `planCodigo:${codigo}`; }
-function guardarPlanPorCodigo(codigo) { try{localStorage.setItem(clavePlanPorCodigo(codigo),JSON.stringify({plan,numDias,prioridad}));}catch(e){} }
-function cargarPlanPorCodigo(codigo) { try{const r=localStorage.getItem(clavePlanPorCodigo(codigo));return r?JSON.parse(r):null;}catch(e){return null;} }
-// Recalcula el código a partir de los ejercicios actuales y guarda todo
-function actualizarCodigoYGuardar() {
-  codigoActual = generarCodigoDesdePlan(numDias, prioridad, plan);
+// El código ES la semilla exacta usada para generar el plan: siempre reconstruible con el mismo código,
+// en cualquier dispositivo, sin depender de datos guardados.
+function generarPlanNuevo() {
+  const seed = generarCodigo(numDias, prioridad);
+  plan = construirPlan(numDias, prioridad, seed);
+  codigoActual = seed;
+  planEditado = false;
   guardarPlan();
-  guardarPlanPorCodigo(codigoActual);
+}
+// Al editar un ejercicio o variar una sesión: el código (semilla) NO cambia — sigue siendo válido
+// para recuperar la base — pero marcamos que hay cambios manuales sobre esa base.
+function marcarPlanEditado() {
+  planEditado = true;
+  guardarPlan();
 }
 
 // ================================================================
@@ -350,14 +347,14 @@ function setTema(v) { localStorage.setItem("tema",v); }
 // ================================================================
 // DOM
 // ================================================================
-let numDias=0, prioridad="maquina", plan=null, codigoActual=null, ultimoSnapshot=null, calcularCalorias=true;
+let numDias=0, prioridad="maquina", plan=null, codigoActual=null, planEditado=false, ultimoSnapshot=null, calcularCalorias=true;
 
 const $=id=>document.getElementById(id);
 const mainViewEl=$("mainView"), progressViewEl=$("progressView"), historyViewEl=$("historyView");
 const daysEl=$("days"), prioEl=$("prioridad"), genBtn=$("genBtn"), planEl=$("plan");
 const totalWeekEl=$("totalWeek"), totalWeekValEl=$("totalWeekVal"), footnoteEl=$("footnote");
 const codeBoxEl=$("codeBox"), resetCodeBtnEl=$("resetCodeBtn"), codeInputEl=$("codeInput");
-const loadCodeBtn=$("loadCodeBtn"), codeErrorEl=$("codeError"), loadCodeSectionEl=$("loadCodeSection");
+const loadCodeBtn=$("loadCodeBtn"), codeErrorEl=$("codeError"), loadCodeSectionEl=$("loadCodeSection"), toggleLoadCodeBtnEl=$("toggleLoadCodeBtn");
 const pesoUsuarioEl=$("pesoUsuario"), pesoErrorEl=$("pesoError"), pesoViewEl=$("pesoView");
 const pesoViewTextEl=$("pesoViewText"), pesoEditEl=$("pesoEdit"), pesoModLinkEl=$("pesoModificarLink");
 const rachaBadgeEl=$("rachaBadge"), undoBoxEl=$("undoBox"), undoBtnEl=$("undoBtn");
@@ -420,16 +417,23 @@ genBtn.onclick=()=>{
   if(!numDias) return;
   if(calcularCalorias){const v=pesoUsuarioActual||parseFloat(pesoUsuarioEl.value);if(isNaN(v)||!v||v<=0){pesoErrorEl.style.display="block";mostrarPesoEdicion();return;}guardarPeso(v);}
   const guardado=cargarPlan(numDias,prioridad);
-  if(guardado&&guardado.plan){plan=guardado.plan;codigoActual=guardado.codigoActual;}
-  else{plan=construirPlan(numDias,prioridad);actualizarCodigoYGuardar();}
+  if(guardado&&guardado.plan){plan=guardado.plan;codigoActual=guardado.codigoActual;planEditado=!!guardado.planEditado;}
+  else{generarPlanNuevo();}
   localStorage.setItem("config:numDias",numDias);localStorage.setItem("config:prioridad",prioridad);
   ultimoSnapshot=null; genBtn.textContent="Generar nueva rutina"; colapsarConfig(); render();
 };
 
 // ---- Nueva rutina ----
 resetCodeBtnEl.addEventListener("click",()=>{
-  plan=construirPlan(numDias,prioridad);
-  ultimoSnapshot=null; actualizarCodigoYGuardar(); render();
+  ultimoSnapshot=null; generarPlanNuevo(); render();
+});
+
+// ---- Mostrar/ocultar carga de código de un compañero/a cuando ya tienes plan propio ----
+toggleLoadCodeBtnEl.addEventListener("click",()=>{
+  const abierto = loadCodeSectionEl.style.display !== "none";
+  loadCodeSectionEl.style.display = abierto ? "none" : "block";
+  toggleLoadCodeBtnEl.textContent = abierto ? "🔑 Usar el código de un compañero/a" : "✕ Cerrar";
+  if(!abierto) codeInputEl.focus();
 });
 
 // ---- Cargar por código ----
@@ -441,9 +445,8 @@ loadCodeBtn.onclick=()=>{
   const dec=decodificarCodigo(val);
   if(!dec){codeErrorEl.textContent="Ese código no es válido.";codeErrorEl.style.display="block";return;}
   numDias=dec.numDias;prioridad=dec.prioridad;
-  const guardadoPorCodigo=cargarPlanPorCodigo(val);
-  if(guardadoPorCodigo&&guardadoPorCodigo.plan){plan=guardadoPorCodigo.plan;codigoActual=val;guardarPlan();}
-  else{plan=construirPlan(numDias,prioridad,val);actualizarCodigoYGuardar();}
+  plan=construirPlan(numDias,prioridad,val);
+  codigoActual=val; planEditado=false; guardarPlan();
   actualizarChipsUI();genBtn.textContent="Generar nueva rutina";colapsarConfig();render();
 };
 
@@ -546,7 +549,11 @@ function filaEjercicioHTML(ej, posIdx, mostrarNum, dayIdx, tipo, poolGrupo, fech
 function render() {
   if (!plan) return;
   guardarPlan();
+  // Si ya hay un plan generado, el bloque "cargar código" se colapsa por defecto,
+  // pero queda accesible desde el botón "Usar el código de un compañero/a"
   loadCodeSectionEl.style.display="none";
+  toggleLoadCodeBtnEl.style.display="block";
+  toggleLoadCodeBtnEl.textContent="🔑 Usar el código de un compañero/a";
   actualizarRacha();
   progressLinkBtnEl.style.display=hayProgreso()?"block":"none";
   historyLinkBtnEl.style.display=listaHistorial().length>0?"block":"none";
@@ -564,7 +571,13 @@ function render() {
     codeBoxEl.style.display="block";
     codeBoxEl.classList.remove("stale");
     codeBoxEl.querySelector(".code-value").textContent=String(codigoActual).padStart(6,"0");
-    codeBoxEl.querySelector(".code-note").textContent="El código se adapta a tus ejercicios actuales. Si cambias uno, cambia el código. Sube 2,5kg cuando completes todas las reps con buena técnica.";
+    if(planEditado){
+      codeBoxEl.classList.add("editado");
+      codeBoxEl.querySelector(".code-note").textContent="✏️ Has editado ejercicios manualmente. Este código sigue recuperando la versión BASE (sin tus cambios) — tus ediciones se guardan solo en este dispositivo. Sube 2,5kg cuando completes todas las reps.";
+    } else {
+      codeBoxEl.classList.remove("editado");
+      codeBoxEl.querySelector(".code-note").textContent="Este código siempre reconstruye exactamente esta rutina, en cualquier dispositivo. Sube 2,5kg cuando completes todas las reps con buena técnica.";
+    }
     resetCodeBtnEl.textContent="Generar nueva rutina";
     resetCodeBtnEl.style.display="block";
   }
@@ -626,7 +639,7 @@ function render() {
       const usados=new Set();
       plan.forEach((p,i)=>{if(i===idx)return;p.sesion.ejercicios.forEach(e=>{usados.add(e.nombre);if(NOMBRE_A_FAM[e.nombre])usados.add(`fam:${NOMBRE_A_FAM[e.nombre]}`);});p.sesion.abdominales.forEach(e=>{usados.add(e.nombre);if(NOMBRE_A_FAM[e.nombre])usados.add(`fam:${NOMBRE_A_FAM[e.nombre]}`);});});
       plan[idx].sesion=generarSesion(plan[idx].sesion.nombre,Math.random,PRIORIDAD_PESOS[prioridad],usados);
-      actualizarCodigoYGuardar(); render();
+      marcarPlanEditado(); render();
     });
   });
 
@@ -654,7 +667,7 @@ function render() {
       const el=fuente.find(e=>e.n===nn); if(!el) return; guardarSnapshot();
       if(tipo==="abs"){const act=plan[dI].sesion.abdominales[pI];plan[dI].sesion.abdominales[pI]={nombre:el.n,maquina:el.m,series:3,reps:el.n.includes("Plancha")?"45-60 seg":"10-12"};}
       else plan[dI].sesion.ejercicios[pI]={nombre:el.n,maquina:el.m,c:el.c,sg:el.sg,...repsFor(el.n,Math.random)};
-      actualizarCodigoYGuardar(); render();
+      marcarPlanEditado(); render();
     });
   });
 }
@@ -663,5 +676,5 @@ function render() {
 (function init(){
   const nd=parseInt(localStorage.getItem("config:numDias")||"0",10);
   const pr=localStorage.getItem("config:prioridad")||"maquina";
-  if(nd>=1&&nd<=7){numDias=nd;prioridad=pr;actualizarChipsUI();const g=cargarPlan(nd,pr);if(g&&g.plan){plan=g.plan;codigoActual=g.codigoActual;genBtn.textContent="Generar nueva rutina";colapsarConfig();render();}}
+  if(nd>=1&&nd<=7){numDias=nd;prioridad=pr;actualizarChipsUI();const g=cargarPlan(nd,pr);if(g&&g.plan){plan=g.plan;codigoActual=g.codigoActual;planEditado=!!g.planEditado;genBtn.textContent="Generar nueva rutina";colapsarConfig();render();}}
 })();

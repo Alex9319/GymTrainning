@@ -127,6 +127,7 @@ h2 { font-size:24px; font-weight:700; font-family:'Oswald',sans-serif; margin-bo
 .footnote { color:var(--muted2); font-size:12px; margin-top:20px; line-height:1.5; }
 .code-box { background:var(--card); border:1px solid var(--accent); border-radius:8px; padding:14px 16px; margin-bottom:20px; text-align:center; }
 .code-box.stale { border-color:var(--border); }
+.code-box.editado { border-color:var(--descarga); }
 .code-box .code-lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'Oswald',sans-serif; }
 .code-box .code-value { font-size:30px; font-weight:700; color:var(--accent); letter-spacing:0.12em; margin:4px 0; }
 .code-box.stale .code-value { color:var(--muted2); font-size:20px; }
